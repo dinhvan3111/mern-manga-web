@@ -1,0 +1,8 @@
+.auth-bg {
+  background: calc(50% - 25vw) 8rem no-repeat #111111;
+}
+
+.card {
+  max-width: 500px;
+  background-color: #212328;
+}
