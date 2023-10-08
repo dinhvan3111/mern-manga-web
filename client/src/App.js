@@ -1,8 +1,7 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import { PAGE_PATH } from "./routes/page-path";
-import LoginForm from "./pages/auth/LoginForm";
 import AuthPage from "./pages/auth/AuthPage";
 import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
@@ -14,6 +13,7 @@ import { ROLE } from "./common/constants";
 import MangaDetailPage from "./pages/manga/MangaDetailPage";
 import BasicLayout from "./components/layout/BasicLayout";
 import NotFoundPage from "./pages/NotFoundPage";
+import LibraryPage from "./pages/library/LibraryPage";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -36,6 +36,14 @@ function App() {
       <Routes>
         <Route path="/" element={<BasicLayout />}>
           <Route path={PAGE_PATH.HOME} element={<HomePage />} />
+          <Route path={PAGE_PATH.LIBRARY} element={<LibraryPage />} />
+        </Route>
+        <Route
+          path="/"
+          element={
+            <BasicLayout textColor="text-white" accordionIconColor="white" />
+          }
+        >
           <Route
             path={PAGE_PATH.MANGA_DETAIL()}
             element={<MangaDetailPage />}

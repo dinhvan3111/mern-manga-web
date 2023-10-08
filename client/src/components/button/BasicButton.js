@@ -25,7 +25,7 @@ const BasicButton = ({
       case BUTTON_TYPE.CLASSIC:
         return `text-white  !bg-orange-500 hover:!bg-orange-600`;
       case BUTTON_TYPE.NO_COLOR:
-        return `basic-hover !shadow-none !bg-transparent !text-gray-600`;
+        return `basic-hover !shadow-none !bg-gray-100 !text-gray-600`;
       default:
         return ``;
     }

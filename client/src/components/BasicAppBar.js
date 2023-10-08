@@ -7,6 +7,7 @@ import UserProfile from "./UserProfile";
 import { useEffect, useState } from "react";
 
 const BasicAppBar = ({
+  leftDrawerOpen,
   textColor,
   accordionIconColor,
   onOpenLeftDrawer = () => {},
@@ -29,7 +30,7 @@ const BasicAppBar = ({
       }`}
     >
       <div className="px-16 py-4 flex justify-between items-center">
-        <div className="flex gap-4">
+        <div className={`${leftDrawerOpen ? "invisible" : ""} flex gap-4`}>
           <IconButton onClick={() => onOpenLeftDrawer()}>
             <BiMenuAltLeft color={!top ? "" : accordionIconColor} />
           </IconButton>
