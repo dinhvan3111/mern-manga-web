@@ -38,3 +38,13 @@ export const ACCORDION_NAV_OPTION = {
     PRIVACY_POLICY: 11,
   },
 };
+
+export const MANGA_STATUS = {
+  ON_GOING: 0,
+  COMPLETED: 1,
+  ABANDONED: 2,
+};
+
+export const reactQueryKey = {
+  ALL_MANGA: ["mangaALl"],
+};

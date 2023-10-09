@@ -4,13 +4,23 @@ const verifyToken = require("../middleware/auth.middleware");
 
 const Manga = require("../models/manga");
 const { ROLE } = require("../utils/database");
+const mangaModel = require("../models/manga.model");
+const numberUtils = require("../utils/numberUtils");
 
 // @route POST api/manga
 // @desc Create manga
 // @access Private
 router.post("/", verifyToken, async (req, res) => {
-  const { name, description, thumbUrl, genres, authors, artists } = req.body;
-
+  const {
+    name,
+    description,
+    thumbUrl,
+    genres,
+    authors,
+    artists,
+    transTeam,
+    status,
+  } = req.body;
   // Simple validation
   if (!name || !description) {
     return res.status(400).json({
@@ -28,6 +38,7 @@ router.post("/", verifyToken, async (req, res) => {
       genres: genres || [],
       authors: authors || [],
       artists: artists || [],
+      transTeam: transTeam || "",
     });
 
     await newManga.save();
@@ -43,15 +54,84 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 // @route GET api/manga
-// @desc Get manga
-// @access Private
+// @desc Get all manga
+// @access Public
 
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const mangas = await Manga.find();
+    const mangas = await Manga.find().populate("genres");
     res.json({
       success: true,
-      mangas,
+      data: { mangas },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// @route GET api/manga/search
+// @desc Search manga
+// @access Public
+router.get("/search", async (req, res) => {
+  const { page, limit, key } = req.query;
+  if (
+    !numberUtils.isNumberic(page) ||
+    !numberUtils.isNumberic(limit) ||
+    numberUtils.toNum(page) < 0 ||
+    numberUtils.toNum(limit) <= 0
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data",
+    });
+  }
+  var conditions = {};
+  if (key) {
+    conditions.$text = { $search: key };
+  }
+  try {
+    const resultMangaList = await mangaModel.getMore(
+      conditions,
+      page,
+      limit,
+      "_id name description thumbUrl rating latestUpdate authors artists transTeam genres status views"
+    );
+    res.json({
+      success: true,
+      data: resultMangaList,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+
+  // try {
+  //   const manga = await Manga.findOne({ _id: req.params.id }).populate(
+  //     "genres"
+  //   );
+  //   res.json({
+  //     success: true,
+  //     data: { manga },
+  //   });
+  // } catch (error) {
+  //   console.log(error);
+  //   res.status(500).json({ success: false, message: "Internal server error" });
+  // }
+});
+
+// @route GET api/manga/id
+// @desc Get manga by id
+// @access Private
+
+router.get("/:id", async (req, res) => {
+  try {
+    const manga = await Manga.findOne({ _id: req.params.id }).populate(
+      "genres"
+    );
+    res.json({
+      success: true,
+      data: { manga },
     });
   } catch (error) {
     console.log(error);
@@ -91,7 +171,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       ...(genres && { genres: genres }),
       ...(authors && { authors: authors }),
       ...(artists && { artists: artists }),
-      ...(status && { status: status || "ON GOING" }),
+      ...(status && { status: status || 0 }),
       // latestUpdate: Date.now,
     };
     const postUpdateCondition = { _id: req.params.id };

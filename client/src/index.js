@@ -8,14 +8,26 @@ import { PersistGate } from "redux-persist/lib/integration/react";
 import store, { persistor } from "./redux-toolkit/configureStore";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // default: true
+      staleTime: 4 * (60 * 1000), // 4 minutes
+    },
+  },
+});
 root.render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
-          <App />
+          <QueryClientProvider client={queryClient}>
+            <App />
+          </QueryClientProvider>
           <ToastContainer />
         </BrowserRouter>
       </PersistGate>

@@ -2,8 +2,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import useClickOutside from "../../hooks/useClickOutSide";
 import { useEffect, useRef, useState } from "react";
 import { IoSearchCircleOutline } from "react-icons/io5";
-import { CircularProgress } from "@mui/material";
 import { useDebounce } from "use-debounce";
+import { CircularProgress } from "@mui/material";
 
 const BasicSearch = ({
   searchRef = null,
@@ -14,7 +14,7 @@ const BasicSearch = ({
   showResultDropdown = false,
   dropdownData = [],
   onChange = (value) => {},
-  noItemText = "Không có kết quả",
+  noItemText = "No results found",
   delay = 500,
   fullWidth = false,
   itemBuilder = (item) => <div></div>,
@@ -120,12 +120,23 @@ const DropdownList = ({
 }) => {
   if (typeof document === "undefined") return null;
   return isLoading ? (
-    <div className="p-2 absolute bg-white z-50 rounded-md border border-gray-300 shadow-md w-full flex justify-center items-center">
-      <CircularProgress size="10"></CircularProgress>
+    <div
+      className="p-2 absolute bg-white z-50 rounded-md border border-gray-300 shadow-md w-full flex justify-center items-center"
+      style={{
+        // left: coords.left,
+        top: coords?.height + 4,
+        width: coords?.width,
+      }}
+    >
+      <CircularProgress
+        style={{
+          color: "orange",
+        }}
+      />
     </div>
   ) : (
     <div
-      className={`absolute bg-white -500 z-50 rounded-md border border-gray-300 shadow-md ${wrapperClassName}`}
+      className={`absolute flex flex-col gap-2 px-4 py-2 bg-white -500 z-50 rounded-md border border-gray-300 shadow-md ${wrapperClassName}`}
       style={{
         // left: coords.left,
         top: coords?.height + 4,

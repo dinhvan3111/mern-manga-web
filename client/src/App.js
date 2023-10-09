@@ -14,6 +14,7 @@ import MangaDetailPage from "./pages/manga/MangaDetailPage";
 import BasicLayout from "./components/layout/BasicLayout";
 import NotFoundPage from "./pages/NotFoundPage";
 import LibraryPage from "./pages/library/LibraryPage";
+import SearchMangaPage from "./pages/manga/SearchMangaPage";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -34,10 +35,16 @@ function App() {
   return (
     <>
       <Routes>
+        {/* ---------White background layout----------------- */}
         <Route path="/" element={<BasicLayout />}>
           <Route path={PAGE_PATH.HOME} element={<HomePage />} />
           <Route path={PAGE_PATH.LIBRARY} element={<LibraryPage />} />
+          <Route
+            path={PAGE_PATH.SEARCH_MANGA()}
+            element={<SearchMangaPage />}
+          />
         </Route>
+        {/*----------Transparent background layout-------------- */}
         <Route
           path="/"
           element={

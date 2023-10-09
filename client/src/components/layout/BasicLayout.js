@@ -64,16 +64,12 @@ const accordionFollowingvOptions = [
 const BasicLayout = ({ textColor, accordionIconColor, ...props }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [selectTab, setSelectTab] = useState();
+  const [selectTab, setSelectTab] = useState(PAGE_PATH.HOME);
   const [open, setOpen] = React.useState(false);
   const onLogout = () => {
     dispatch(logout());
     navigate(PAGE_PATH.LOGIN);
   };
-  const classNameWhenActive = ({ isActive }) =>
-    isActive
-      ? "bg-orange-500 hover:bg-orange-600 text-white"
-      : "hover:bg-gray-300";
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
@@ -120,35 +116,43 @@ const BasicLayout = ({ textColor, accordionIconColor, ...props }) => {
               </IconButton>
             </div>
             <div className="w-full">
-              <NavLink to={PAGE_PATH.HOME} className={classNameWhenActive}>
-                <div className="mt-4">
-                  <div
-                    className={`no-select py-1 px-2 flex gap-2 rounded-md cursor-pointer `}
-                    onClick={() => setSelectTab(ACCORDION_NAV_OPTION.HOME)}
-                  >
-                    <FiHome size={20} />
-                    <span className="font-bold">Home</span>
-                  </div>
+              <div className="mt-4">
+                <div
+                  className={`no-select py-1 px-2 flex gap-2 rounded-md cursor-pointer ${
+                    selectTab === PAGE_PATH.HOME
+                      ? "bg-orange-500 hover:bg-orange-600 text-white"
+                      : "hover:bg-gray-300"
+                  }`}
+                  onClick={() => {
+                    setSelectTab(PAGE_PATH.HOME);
+                    navigate(PAGE_PATH.HOME);
+                  }}
+                >
+                  <FiHome size={20} />
+                  <span className="font-bold">Home</span>
                 </div>
-              </NavLink>
+              </div>
               <div className="mt-4">
                 <div className="py-1 px-2 flex gap-2 no-select">
                   <FiBookmark size={20} />
                   <span className="font-bold">Following</span>
                 </div>
                 {accordionFollowingvOptions.map((item) => (
-                  <NavLink to={item.path} className={classNameWhenActive}>
-                    <div
-                      key={item.value}
-                      className={`py-1 px-2 flex gap-1 justify-start items-center hover:bg-gray-300 cursor-pointer rounded-md no-select `}
-                      onClick={() => {
-                        setSelectTab(item.value);
-                        //set tab here
-                      }}
-                    >
-                      <span className="text-base">{item.title} </span>
-                    </div>
-                  </NavLink>
+                  <div
+                    key={item.value}
+                    className={`py-1 px-2 flex gap-1 justify-start items-center hover:bg-gray-300 cursor-pointer rounded-md no-select ${
+                      selectTab === item.path
+                        ? "bg-orange-500 hover:bg-orange-600 text-white"
+                        : "hover:bg-gray-300"
+                    }`}
+                    onClick={() => {
+                      setSelectTab(item.path);
+                      //set tab here
+                      navigate(item.path);
+                    }}
+                  >
+                    <span className="text-base">{item.title} </span>
+                  </div>
                 ))}
               </div>
             </div>

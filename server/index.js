@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const authRouter = require("./routes/auth");
 const mangaRouter = require("./routes/manga");
+const genreRouter = require("./routes/genre");
 
 const connectDB = async () => {
   try {
@@ -25,8 +26,8 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/auth", authRouter);
-
 app.use("/api/manga", mangaRouter);
+app.use("/api/genre", genreRouter);
 
 const PORT = 5000;
 

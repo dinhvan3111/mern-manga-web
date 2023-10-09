@@ -13,8 +13,8 @@ const axiosClient = axios.create({
   paramsSerializer: (params) => queryString.stringify(params),
 });
 axiosClient.interceptors.request.use(async (config) => {
-  if (store.getState()?.user?.userData && !config.headers.Authorization) {
-    const accessToken = store.getState()?.user?.userData?.accessToken;
+  if (store.getState()?.auth?.user?.token && !config.headers.Authorization) {
+    const accessToken = store.getState()?.auth?.user?.token?.accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }

@@ -2,8 +2,9 @@ POST http://localhost:5000/api/auth/register HTTP/1.1
 Content-type: application/json
 
 {
-    "username": "dinhvan123",
-    "password": "123"
+    "username": "kohei",
+    "password": "123",
+    "role": 1
 }
 
 ###
@@ -21,9 +22,14 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5ODM4NDQ0MDcwZGVmMGRkZmQyOGQiLCJpYXQiOjE2OTYxNzY5NTd9.0Kk7-jwh-bFYyI2K9xeu-fkECKbB8LQS0jk5nYcpe9U
 
 {
-    "name": "test",
-    "description": "Jujutsu Kaisen is a Japanese manga series written and illustrated by Gege Akutami. It has been serialized in Shueisha's shōnen manga magazine Weekly Shōnen Jump since March 2018, with its chapters collected and published in 23 tankōbon volumes as of July 2023",
-    "thumbUrl": "https://m.media-amazon.com/images/M/MV5BMTMwMDM4N2EtOTJiYy00OTQ0LThlZDYtYWUwOWFlY2IxZGVjXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg"
+    "name": "Boku no hero academia",
+    "description": "My Hero Academia is a Japanese superhero manga series written and illustrated by Kōhei Horikoshi. It has been serialized in Shueisha's shōnen manga magazine Weekly Shōnen Jump since July 2014, with its chapters additionally collected into 38 tankōbon volumes as of June 2023.",
+    "thumbUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Boku_no_Hero_Academia_Volume_1.png/220px-Boku_no_Hero_Academia_Volume_1.png",
+    "authors": ["Kohei Horikoshi"],
+    "artists": ["Kohei Horikoshi"],
+    "transTeam": "Vz3",
+    "genres": ["652291e173f058e83b54480d", "652291f673f058e83b54480f", "652291fa73f058e83b544811"],
+    "status": 3
 }
 
 ###
@@ -48,7 +54,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhO
     "description": "vưqedwq"
 }
 
-### 
-DELETE  http://localhost:5000/api/manga/651aa4e3ed3087c59c578448 HTTP/1.1
+DELETE  http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1
+Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTExNmUyYzAxMDQ0NzcxYjUzYzQiLCJyb2xlIjowLCJpYXQiOjE2OTYyNDA3NDR9.qlgwo8FUChaZKEknLGq7zDYAqmqlgOxGY83b2jcX1Bk
 
+
+### SEARCH MANGA
+GET http://localhost:5000/api/manga/search?key=&page=1&limit=2 HTTP/1.1
+
+
+### =========================================GENRE========================================
+POST http://localhost:5000/api/genre HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTExNmUyYzAxMDQ0NzcxYjUzYzQiLCJyb2xlIjowLCJpYXQiOjE2OTYyNDA3NDR9.qlgwo8FUChaZKEknLGq7zDYAqmqlgOxGY83b2jcX1Bk
+
+{
+    "name": "Fantasy"
+}

@@ -13,6 +13,8 @@ const PAGE_PATH = {
   PROFILE: "/profile",
 
   MANGA_DETAIL: (id) => (id === undefined ? "/manga/:id" : `/manga/${id}`),
+  SEARCH_MANGA: (key) =>
+    key === undefined ? "/manga/search" : `/manga/search?key=${key}`,
   LIBRARY: "/library",
 };
 
