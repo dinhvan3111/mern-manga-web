@@ -15,6 +15,8 @@ import BasicLayout from "./components/layout/BasicLayout";
 import NotFoundPage from "./pages/NotFoundPage";
 import LibraryPage from "./pages/library/LibraryPage";
 import SearchMangaPage from "./pages/manga/SearchMangaPage";
+import AddMangaPage from "./pages/admin/AddMangaPage";
+import MangaMangament from "./pages/admin/MangaMangament";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -43,6 +45,32 @@ function App() {
             path={PAGE_PATH.SEARCH_MANGA()}
             element={<SearchMangaPage />}
           />
+          <Route
+            path={PAGE_PATH.PROFILE}
+            element={
+              <ProtectedRoute pageRole={[ROLE.ADMIN, ROLE.AUTHOR, ROLE.USER]} />
+            }
+          >
+            <Route path={PAGE_PATH.PROFILE} element={<ProfilePage />}></Route>
+          </Route>
+          <Route
+            path={PAGE_PATH.MANGA_MANAGEMENT}
+            element={<ProtectedRoute pageRole={[ROLE.ADMIN]} />}
+          >
+            <Route
+              path={PAGE_PATH.MANGA_MANAGEMENT}
+              element={<MangaMangament />}
+            ></Route>
+          </Route>
+          <Route
+            path={PAGE_PATH.ADD_MANGA}
+            element={<ProtectedRoute pageRole={[ROLE.ADMIN]} />}
+          >
+            <Route
+              path={PAGE_PATH.ADD_MANGA}
+              element={<AddMangaPage />}
+            ></Route>
+          </Route>
         </Route>
         {/*----------Transparent background layout-------------- */}
         <Route
@@ -56,6 +84,8 @@ function App() {
             element={<MangaDetailPage />}
           />
         </Route>
+
+        {/*----------No layout-------------- */}
         <Route
           path={PAGE_PATH.REGISTER}
           element={<AuthPage authRoute="register" />}
@@ -68,14 +98,6 @@ function App() {
             path={PAGE_PATH.LOGIN}
             element={<AuthPage authRoute="login" />}
           />
-        </Route>
-        <Route
-          path={PAGE_PATH.PROFILE}
-          element={
-            <ProtectedRoute pageRole={[ROLE.ADMIN, ROLE.AUTHOR, ROLE.USER]} />
-          }
-        >
-          <Route path={PAGE_PATH.PROFILE} element={<ProfilePage />}></Route>
         </Route>
         <Route path="*" element={<NotFoundPage></NotFoundPage>}></Route>
       </Routes>

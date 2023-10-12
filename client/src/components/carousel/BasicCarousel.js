@@ -38,7 +38,11 @@ export const BasicBannerCarouselItem = ({ item, index }) => {
   const navigate = useNavigate();
   return (
     <div
-      style={{ "--image-url": `url(${item?.thumbUrl})` }}
+      style={{
+        "--image-url": `url(${
+          item.thumbUrl !== "" ? item.thumbUrl : "/images/no_manga_thumb.png"
+        })`,
+      }}
       className={`h-72 bg-gray-200 rounded-md bg-[image:var(--image-url)] bg-no-repeat bg-cover bg-center`}
     >
       <div className="px-4 py-4 w-full h-full flex gap-4 backdrop-blur-lg bg-white/90">

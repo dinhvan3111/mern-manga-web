@@ -16,10 +16,8 @@ const MAX_COL = 3;
 const HomePage = () => {
   const [recentUpdateMangas, setRecentUpdateMangas] = useState([]);
   const renderRecentManga = (data) => {
-    console.log("data", data);
     const recentMangaContainers = [];
     const cols = Math.floor(data.length / ITEMS_PER_COL) + 1;
-    console.log(cols);
     var startIndex = 0;
     var endIndex = ITEMS_PER_COL;
     for (let i = 0; i < cols; i++) {
@@ -36,10 +34,10 @@ const HomePage = () => {
     isLoading,
     isFetched,
   } = useQuery(reactQueryKey.ALL_MANGA, async () => {
-    const res = await mangaApi.getAllMangas();
+    const res = await mangaApi.getAllMangas(1, 5);
     console.log(res);
     if (res.success) {
-      return res.data.mangas;
+      return res.data.docs;
     } else {
       return [];
     }
@@ -138,7 +136,15 @@ const BasicMangaEntity = ({ manga, ...props }) => {
         className="max-w-[56px] min-w-[56px] h-20 cursor-pointer"
         onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
       >
-        <img className="w-full h-full" src={manga.thumbUrl} alt="img" />
+        <img
+          className="w-full h-full"
+          src={
+            manga.thumbUrl !== ""
+              ? manga.thumbUrl
+              : "/images/no_manga_thumb.png"
+          }
+          alt="img"
+        />
       </div>
       <div className="flex flex-col gap-2 grow w-full">
         <div

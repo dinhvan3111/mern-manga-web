@@ -22,7 +22,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5ODM4NDQ0MDcwZGVmMGRkZmQyOGQiLCJpYXQiOjE2OTYxNzY5NTd9.0Kk7-jwh-bFYyI2K9xeu-fkECKbB8LQS0jk5nYcpe9U
 
 {
-    "name": "Boku no hero academia",
+    "name": "Boku",
     "description": "My Hero Academia is a Japanese superhero manga series written and illustrated by Kōhei Horikoshi. It has been serialized in Shueisha's shōnen manga magazine Weekly Shōnen Jump since July 2014, with its chapters additionally collected into 38 tankōbon volumes as of June 2023.",
     "thumbUrl": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Boku_no_Hero_Academia_Volume_1.png/220px-Boku_no_Hero_Academia_Volume_1.png",
     "authors": ["Kohei Horikoshi"],
@@ -71,3 +71,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhO
 {
     "name": "Fantasy"
 }
+
+### GET ALL GENRES
+GET http://localhost:5000/api/genre HTTP/1.1

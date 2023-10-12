@@ -1,7 +1,7 @@
-import { AiOutlineSearch } from "react-icons/ai";
+import { AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import useClickOutside from "../../hooks/useClickOutSide";
 import { useEffect, useRef, useState } from "react";
-import { IoSearchCircleOutline } from "react-icons/io5";
+import { IoRemove, IoSearchCircleOutline } from "react-icons/io5";
 import { useDebounce } from "use-debounce";
 import { CircularProgress } from "@mui/material";
 
@@ -25,6 +25,7 @@ const BasicSearch = ({
   showSearchResultItem = false,
   keyword,
   setKeyWord,
+  hasAnimation = true,
 }) => {
   const [searchKey, setSearchKey] = useState("");
   const [debounceKeyword] = useDebounce(keyword ? keyword : searchKey, delay);
@@ -47,6 +48,10 @@ const BasicSearch = ({
       setShow(true);
     }
   };
+  const onClearSearchKey = () => {
+    if (setKeyWord) setKeyWord("");
+    else setSearchKey("");
+  };
   useEffect(() => {
     if (notInitialRender.current) {
       onChange(debounceKeyword);
@@ -64,7 +69,7 @@ const BasicSearch = ({
   return (
     <div
       ref={nodeRef}
-      className=" relative bg-gray-100 max-w-3xl flex items-center h-fit rounded-md"
+      className={`relative bg-gray-100 max-w-full flex items-center h-fit rounded-md ${classNameWrapper}`}
     >
       {/* <input
       type="text"
@@ -74,7 +79,9 @@ const BasicSearch = ({
       <input
         ref={searchRef}
         type="text"
-        className={`w-56 transition-all duration-300 ease-out focus:w-[500px] max-h-12 pr-3 px-4 py-1 !pl-10 text-sm sm:leading-6 font-semibold text-gray-900 rounded-md bg-gray-100 focus:bg-white focus:ring-blue-100 focus:border-blue-500  `}
+        className={` transition-all duration-300 ease-out ${
+          hasAnimation ? "w-56 focus:w-[500px]" : "w-full"
+        } max-h-12 pr-3 px-4 py-1 !pl-10 text-sm sm:leading-6 font-semibold text-gray-900 rounded-md bg-gray-100 focus:bg-white focus:ring-blue-100 focus:border-blue-500 outline-orange-500 ${className}  `}
         placeholder="Search"
         onChange={handleOnChangeKeyword}
         onClick={onClickSearchInput}
@@ -85,10 +92,20 @@ const BasicSearch = ({
       <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
         <AiOutlineSearch />
       </div>
+      {keyword && (
+        <div className="absolute px-2 flex items-center inset-y-0 right-0 bottom-0 top-0">
+          <div
+            className="bg-orange-500 p-1 rounded-md cursor-pointer"
+            onClick={onClearSearchKey}
+          >
+            <AiOutlineClose color="white" />
+          </div>
+        </div>
+      )}
       {/* <div className="px-2 rounded-md absolute m-auto right-0 top-0 bottom-0 flex items-center bg-gray-200 h-fit">
       Ctrl
     </div> */}
-      {show && (
+      {showResultDropdown && show && (
         <DropdownList
           keyword={keyword}
           coords={coords}

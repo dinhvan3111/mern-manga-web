@@ -1,7 +1,12 @@
 import { TextField } from "@mui/material";
 import { useController } from "react-hook-form";
 
-const BasicTextFiled = ({
+export const TextFieldType = {
+  DARK: 1,
+  LIGHT: 2,
+};
+
+const BasicTextField = ({
   className = "",
   name = "",
   variant = "outlined",
@@ -12,6 +17,7 @@ const BasicTextFiled = ({
   errMsg = false,
   hasErrors = false,
   wrapperClass = "w-full",
+  textfieldType = TextFieldType.LIGHT,
   ...props
 }) => {
   const { field } = useController({
@@ -26,14 +32,18 @@ const BasicTextFiled = ({
         className={`${className} !border-red-500`}
         variant={variant}
         size={size}
+        minRows={props.multiline ? 3 : null}
+        maxRows={props.multiline ? 10 : null}
         sx={{
-          input: { color: "white" },
+          input: {
+            color: textfieldType === TextFieldType.DARK ? "white" : "black",
+          },
           width: "100%",
           "& label.Mui-focused": {
             color: "orange",
           },
           "& .MuiInputBase-root": {
-            background: "#3d414a",
+            background: textfieldType === TextFieldType.DARK ? "#3d414a" : "",
           },
           "& .MuiOutlinedInput-root": {
             "& fieldset": {
@@ -60,4 +70,4 @@ const BasicTextFiled = ({
   );
 };
 
-export default BasicTextFiled;
+export default BasicTextField;

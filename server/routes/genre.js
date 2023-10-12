@@ -36,6 +36,18 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const genres = await Genre.find()
+      .sort({ name: 1 })
+      .collation({ locale: "en", caseLevel: true });
+    res.json({ success: true, data: genres });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
 // // @route DELETE api/genre
 // // @desc Delete genre
 // // @access Private

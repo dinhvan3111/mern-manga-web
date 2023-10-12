@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import BasicButton from "../../components/button/BasicButton";
 import "./AuthPage.css";
-import BasicTextFiled from "../../components/input/BasicTextField";
+import BasicTextField, {
+  TextFieldType,
+} from "../../components/input/BasicTextField";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -54,20 +56,22 @@ const LoginForm = () => {
               <label htmlFor="username" className="font-semibold">
                 Username or email
               </label>
-              <BasicTextFiled
+              <BasicTextField
+                textfieldType={TextFieldType.DARK}
                 name="username"
                 control={control}
-              ></BasicTextFiled>
+              ></BasicTextField>
             </div>
             <div className="flex flex-col items-start gap-2">
               <label htmlFor="password" className="font-semibold">
                 Password
               </label>
-              <BasicTextFiled
+              <BasicTextField
+                textfieldType={TextFieldType.DARK}
                 type="password"
                 name="password"
                 control={control}
-              ></BasicTextFiled>
+              ></BasicTextField>
             </div>
           </div>
           <div className="mt-4 flex justify-between items-center">

@@ -18,7 +18,7 @@ const BasicTag = ({
   label,
   className,
   showStatusDot = false,
-  statusDotColor = "bg-green-500",
+  statusDotColor,
   mangaStatus,
   ...props
 }) => {
@@ -29,9 +29,9 @@ const BasicTag = ({
     >
       {showStatusDot && (
         <div
-          className={`w-2 h-2 rounded-full ${renderMangaStatusColor(
-            mangaStatus
-          )} ${statusDotColor}`}
+          className={`w-2 h-2 rounded-full ${
+            !statusDotColor && renderMangaStatusColor(mangaStatus)
+          } ${statusDotColor}`}
         ></div>
       )}
       <div>{label}</div>

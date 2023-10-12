@@ -4,6 +4,12 @@ export const ROLE = {
   USER: 2,
 };
 
+export const SUBMIT_STATUS = {
+  SUCCESS: "success",
+  LOADING: "loading",
+  FAILED: "failed",
+};
+
 export const USER_MENU = {
   PREFERENCES: {
     SETTING: 1,
@@ -36,6 +42,9 @@ export const ACCORDION_NAV_OPTION = {
   VZ_MANGA: {
     ABOUT_US: 10,
     PRIVACY_POLICY: 11,
+  },
+  ADMIN: {
+    MANGA_MANGAEMENT: 12,
   },
 };
 

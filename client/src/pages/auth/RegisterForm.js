@@ -3,7 +3,9 @@ import BasicButton from "../../components/button/BasicButton";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import BasicTextFiled from "../../components/input/BasicTextField";
+import BasicTextFiled, {
+  TextFieldType,
+} from "../../components/input/BasicTextField";
 import { registerSchema } from "../../common/form-schema";
 import { useDispatch } from "react-redux";
 import { login } from "../../redux-toolkit/authSlice";
@@ -52,6 +54,7 @@ const RegisterForm = () => {
                 Username <span className="text-orange-400">*</span>
               </label>
               <BasicTextFiled
+                textfieldType={TextFieldType.DARK}
                 name="username"
                 control={control}
                 hasErrors={true}
@@ -63,6 +66,7 @@ const RegisterForm = () => {
                 Password <span className="text-orange-400">*</span>
               </label>
               <BasicTextFiled
+                textfieldType={TextFieldType.DARK}
                 type="password"
                 name="password"
                 control={control}
@@ -75,6 +79,7 @@ const RegisterForm = () => {
                 Confirm password <span className="text-orange-400">*</span>
               </label>
               <BasicTextFiled
+                textfieldType={TextFieldType.DARK}
                 type="password"
                 name="confirmPassword"
                 control={control}

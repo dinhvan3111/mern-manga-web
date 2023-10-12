@@ -9,12 +9,14 @@ const getMore = async (
   if (page < 0 || limit <= 0) {
     return null;
   }
-  const mangas = await Manga.paginate(conditions, {
+  const options = {
+    populate: "genres",
     page,
     limit,
     select: selections,
     sort,
-  });
+  };
+  const mangas = await Manga.paginate(conditions, options);
   return mangas;
 };
 module.exports = { getMore };

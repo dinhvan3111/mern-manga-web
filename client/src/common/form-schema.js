@@ -49,4 +49,9 @@ const registerSchema = yup.object({
   confirmPassword: cPwdObj(),
 });
 
-export { registerSchema };
+const addMangaSchema = yup.object({
+  name: yup.string().required("Please enter manga name").trim(),
+  description: yup.string().required("Please enter manga description").trim(),
+});
+
+export { registerSchema, addMangaSchema };

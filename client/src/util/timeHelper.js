@@ -28,7 +28,6 @@ const calculateDateDistance = (date1, date2) => {
 
 const getDateDiff = (date) => {
   const diff = calculateDateDistance(date, Date.now());
-  console.log(diff);
   if (diff.yearsDifference > 0)
     return `${
       diff.yearsDifference <= 1
