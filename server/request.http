@@ -47,20 +47,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5O
 ### GET MANGA DETAIL
 GET http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1 
 
-###
-PUT http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1
+### UPDATE MANGA
+PUT http://localhost:5000/api/manga/652d3bd66a84f95538d73d18 HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTExNmUyYzAxMDQ0NzcxYjUzYzQiLCJyb2xlIjowLCJpYXQiOjE2OTYyNDA3NDR9.qlgwo8FUChaZKEknLGq7zDYAqmqlgOxGY83b2jcX1Bk
 
 {
-    "name": "Manga test 1",
-    "description": "vưqedwq"
+    "description": "One rainy night, Saki is rushing to a piano lesson when she crashes into a beautiful, long-haired girl, dropping her sheet music in the process. Saki stutters an apology, but the girl simply hands back her sheet music and leaves without a word. Saki begins her first day of high school the following morning, only to find the stranger from the night before sitting at the desk next to hers. She learns that the girl’s name is Kanon and that she is not quite completely deaf, but very hard of hearing. Though Kanon needs to be close to people to read their lips, she tends to push people away with her icy demeanor. Through one kind gesture, Saki slowly begins breaking down the walls around Kanon, even as she feels something new blossoming within her. [Kodansha]"
 }
 
-DELETE  http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1
+### DELETE MANGA
+
+DELETE http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTExNmUyYzAxMDQ0NzcxYjUzYzQiLCJyb2xlIjowLCJpYXQiOjE2OTYyNDA3NDR9.qlgwo8FUChaZKEknLGq7zDYAqmqlgOxGY83b2jcX1Bk
-
 
 ### SEARCH MANGA
 GET http://localhost:5000/api/manga/search?key=&page=1&limit=2 HTTP/1.1

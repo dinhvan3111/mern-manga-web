@@ -11,7 +11,7 @@ const getMore = async (
   }
   const options = {
     populate: {
-      path: "chapters",
+      path: "chapters genres",
       options: { sort: { publishDate: -1 } },
     },
     page,

@@ -62,7 +62,7 @@ const AddMangaPage = () => {
     setIsFetchingGenres(false);
   };
   const resetFileds = () => {
-    if (SUBMIT_STATUS.FAILED) return;
+    if (addMangaStatus === SUBMIT_STATUS.FAILED) return;
     reset();
     setSelectedGenres([]);
   };
@@ -110,6 +110,7 @@ const AddMangaPage = () => {
     }
   };
   useEffect(() => {
+    console.log("is Submit successful");
     resetFileds();
   }, [isSubmitSuccessful]);
   useEffect(() => {
@@ -160,7 +161,7 @@ const AddMangaPage = () => {
                     <BasicTextField
                       name="description"
                       multiline={true}
-                      inputProps={{ maxLength: 200 }}
+                      inputProps={{ maxLength: 1000 }}
                       control={control}
                       hasErrors={true}
                       errMsg={

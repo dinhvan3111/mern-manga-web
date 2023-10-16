@@ -72,7 +72,6 @@ const accordionAdminOptions = [
 const BasicLayout = ({ textColor, accordionIconColor, ...props }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [selectTab, setSelectTab] = useState(PAGE_PATH.HOME);
   const [open, setOpen] = React.useState(false);
   const onLogout = () => {
     dispatch(logout());
@@ -110,18 +109,22 @@ const BasicLayout = ({ textColor, accordionIconColor, ...props }) => {
         anchor="left"
         open={open}
       >
-        <BasicDrawer
-          selectTab={selectTab}
-          setSelectTab={setSelectTab}
-          open={open}
-          setOpen={setOpen}
-        />
+        <BasicDrawer open={open} setOpen={setOpen} />
       </Drawer>
     </Box>
   );
 };
 
-const BasicDrawer = ({ open, setOpen, selectTab, setSelectTab }) => {
+const activeNavLinkStyle = ({ isActive }) => ({
+  padding: "4px 8px",
+  color: isActive ? "white" : "black",
+  background: isActive ? "rgb(249, 115, 22)" : "",
+  borderRadius: "6px",
+  width: "100%",
+  display: "inline-block",
+});
+
+const BasicDrawer = ({ open, setOpen }) => {
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   return (
@@ -140,20 +143,12 @@ const BasicDrawer = ({ open, setOpen, selectTab, setSelectTab }) => {
         </div>
         <div className="w-full">
           <div className="mt-4">
-            <div
-              className={`no-select py-1 px-2 flex gap-2 rounded-md cursor-pointer ${
-                selectTab === PAGE_PATH.HOME
-                  ? "bg-orange-500 hover:bg-orange-600 text-white"
-                  : "hover:bg-gray-300"
-              }`}
-              onClick={() => {
-                setSelectTab(PAGE_PATH.HOME);
-                navigate(PAGE_PATH.HOME);
-              }}
-            >
-              <FiHome size={20} />
-              <span className="font-bold">Home</span>
-            </div>
+            <NavLink to={PAGE_PATH.HOME} style={activeNavLinkStyle}>
+              <div className="flex gap-2 items-center">
+                <FiHome size={20} />
+                <span className="font-bold">Home</span>
+              </div>
+            </NavLink>
           </div>
           <div className="mt-4">
             <div className="py-1 px-2 flex gap-2 no-select">
@@ -164,19 +159,10 @@ const BasicDrawer = ({ open, setOpen, selectTab, setSelectTab }) => {
             </div>
             {user?.data?.role === ROLE.ADMIN
               ? accordionAdminOptions.map((item) => (
-                  <DrawerTab
-                    key={item.value}
-                    item={item}
-                    selectTab={selectTab}
-                    setSelectTab={setSelectTab}
-                  />
+                  <DrawerTab key={item.value} item={item} />
                 ))
               : accordionFollowingvOptions.map((item) => (
-                  <DrawerTab
-                    item={item}
-                    selectTab={selectTab}
-                    setSelectTab={setSelectTab}
-                  />
+                  <DrawerTab item={item} />
                 ))}
           </div>
         </div>
@@ -185,24 +171,11 @@ const BasicDrawer = ({ open, setOpen, selectTab, setSelectTab }) => {
   );
 };
 
-const DrawerTab = ({ item, selectTab, setSelectTab }) => {
-  const navigate = useNavigate();
+const DrawerTab = ({ item }) => {
   return (
-    <div
-      key={item.value}
-      className={`py-1 px-2 flex gap-1 justify-start items-center hover:bg-gray-300 cursor-pointer rounded-md no-select ${
-        selectTab === item.path
-          ? "bg-orange-500 hover:bg-orange-600 text-white"
-          : "hover:bg-gray-300"
-      }`}
-      onClick={() => {
-        setSelectTab(item.path);
-        //set tab here
-        navigate(item.path);
-      }}
-    >
-      <span className="text-base">{item.title} </span>
-    </div>
+    <NavLink to={item.path} style={activeNavLinkStyle}>
+      {item.title}
+    </NavLink>
   );
 };
 

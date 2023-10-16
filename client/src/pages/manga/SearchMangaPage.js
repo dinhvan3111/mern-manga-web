@@ -12,7 +12,7 @@ import BasicTag from "../../components/tag/BasicTag";
 import { mangaStatusToString } from "../../util/stringHelper";
 import BasicPagination from "../../components/pagination/Pagination";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 10;
 
 const SearchMangaPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();

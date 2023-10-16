@@ -16,7 +16,7 @@ import PopupMsg from "../../components/popup/PopupMessage";
 import ConfirmPopup from "../../components/popup/ConfirmPopup";
 import AsyncImage from "../../components/AsyncImage";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const MangaMangament = () => {
   const navigate = useNavigate();

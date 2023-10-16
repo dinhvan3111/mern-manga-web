@@ -263,7 +263,7 @@ const MangaDetailContent = ({
                 </div>
               </div>
               <div className="mt-20">
-                <p className="leading-7 w-[70%]">{manga?.description}</p>
+                <p className="leading-7 w-full">{manga?.description}</p>
                 <div className="mt-8">
                   <div className="flex gap-5">
                     <div className="flex-1 flex gap-8 h-fit flex-wrap">

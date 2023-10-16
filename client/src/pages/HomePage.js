@@ -20,7 +20,10 @@ const HomePage = () => {
   const [recentUpdateMangas, setRecentUpdateMangas] = useState([]);
   const renderRecentManga = (data) => {
     const recentMangaContainers = [];
-    const cols = Math.floor(data.length / RECENT_MANGA_ITEMS_PER_COL) + 1;
+    const cols =
+      data.length % 6 === 0
+        ? data.length / RECENT_MANGA_ITEMS_PER_COL
+        : Math.floor(data.length / RECENT_MANGA_ITEMS_PER_COL) + 1;
     var startIndex = 0;
     var endIndex = RECENT_MANGA_ITEMS_PER_COL;
     for (let i = 0; i < cols; i++) {

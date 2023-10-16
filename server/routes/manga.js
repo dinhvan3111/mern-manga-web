@@ -237,16 +237,17 @@ router.put("/:id", verifyToken, async (req, res) => {
     });
   }
   // Simple validation
-  if (!name || !description) {
+  if ((name && name === "") || (description && !description === "")) {
     return res.status(400).json({
       success: false,
       message: "Manga name and description are required",
     });
   }
+  const oldManga = await Manga.findOne({ _id: req.params.id });
   try {
     let updatedManga = {
-      name,
-      description,
+      name: name || oldManga.name,
+      description: description || oldManga.description,
       ...(thumbUrl && {
         thumbUrl: thumbUrl.startsWith("https://")
           ? thumbUrl
@@ -260,7 +261,7 @@ router.put("/:id", verifyToken, async (req, res) => {
     };
     const mangaUpdateCondition = { _id: req.params.id };
     updatedManga = await Manga.findOneAndUpdate(
-      postUpdateCondition,
+      mangaUpdateCondition,
       updatedManga,
       { new: true }
     );
