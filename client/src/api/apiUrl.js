@@ -9,7 +9,10 @@ export const API = {
   ADD_MANGA: "/api/manga",
   UPDATE_MANGA: (id) => `/api/manga/${id}`,
   DELETE_MANGA: (id) => `/api/manga/${id}`,
-  MANGA_ALL: (page, limit) => `/api/manga?page=${page}&limit=${limit}`,
+  MANGA_ALL: (page, limit, sortByViews, sortByLatestUpdate) =>
+    `/api/manga?page=${page}&limit=${limit}${
+      sortByViews ? `&sortByViews=${sortByViews}` : ""
+    }${sortByLatestUpdate ? `&sortByLatestUpdate=${sortByLatestUpdate}` : ""}`,
   MANGA_BY_ID: (id) => `/api/manga/${id}`,
   SEARCH_MANGA: (key, page, limit) =>
     `/api/manga/search?key=${key}&page=${page}&limit=${limit}`,
@@ -17,4 +20,14 @@ export const API = {
 
   // ===========GENRE===============
   GENRE_ALL: "/api/genre",
+
+  // ===========CHAPTER===============
+  ADD_CHAPTER: "/api/chapter",
+  GET_ALL_CHAPTER: (mangaId, page, limit, sortByTime) =>
+    `/api/chapter/${mangaId}?page=${page}&limit=${limit}${
+      sortByTime ? `&sortByTime=${sortByTime}` : ""
+    }`,
+  GET_ALL_IMAGES_OF_CHAPTER: (id) => `/api/chapter/${id}/imgs`,
+  UPDATE_CHAPTER: (id) => `/api/chapter/${id}`,
+  DELETE_CHAPTER: (id) => `/api/chapter/${id}`,
 };

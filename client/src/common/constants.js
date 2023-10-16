@@ -55,5 +55,11 @@ export const MANGA_STATUS = {
 };
 
 export const reactQueryKey = {
-  ALL_MANGA: ["mangaALl"],
+  POPULAR_MANGA: ["popularManga"],
+  ALL_MANGA: ["mangaAll"],
+};
+
+export const SORT_CHAPTER = {
+  ASC: 1,
+  DESC: -1,
 };

@@ -1,4 +1,4 @@
-const Manga = require("../models/manga");
+const Chapter = require("../models/chapter");
 const getMore = async (
   conditions,
   page = 0,
@@ -10,16 +10,12 @@ const getMore = async (
     return null;
   }
   const options = {
-    populate: {
-      path: "chapters",
-      options: { sort: { publishDate: -1 } },
-    },
     page,
     limit,
     select: selections,
     sort,
   };
-  const mangas = await Manga.paginate(conditions, options);
-  return mangas;
+  const chapters = await Chapter.paginate(conditions, options);
+  return chapters;
 };
 module.exports = { getMore };

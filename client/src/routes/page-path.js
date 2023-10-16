@@ -12,12 +12,17 @@ const PAGE_PATH = {
   REGISTER: "/register",
   PROFILE: "/profile",
 
+  //==========MANGA==================
   ADD_MANGA: "/admin/manga/add",
   MANGA_MANAGEMENT: "/admin/manga/management",
   MANGA_DETAIL: (id) => (id === undefined ? "/manga/:id" : `/manga/${id}`),
   SEARCH_MANGA: (key) =>
     key === undefined ? "/manga/search" : `/manga/search?key=${key}`,
   LIBRARY: "/library",
+
+  //==========CHAPTER===============
+  READ_CHAPTER: (id, page = 1) =>
+    id === undefined ? `/chapter/:id/:page` : `/chapter/${id}/${page}`,
 };
 
 export { PAGE_PATH };

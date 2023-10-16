@@ -83,7 +83,7 @@ router.post("/", verifyToken, async (req, res) => {
 // @access Public
 
 router.get("/", async (req, res) => {
-  const { page, limit } = req.query;
+  const { page, limit, sortByViews, sortByLatestUpdate } = req.query;
   if (
     !numberUtils.isNumberic(page) ||
     !numberUtils.isNumberic(limit) ||
@@ -95,12 +95,49 @@ router.get("/", async (req, res) => {
       message: "Invalid data",
     });
   }
+  if (sortByViews) {
+    if (
+      !numberUtils.isNumberic(sortByViews) ||
+      (numberUtils.toNum(sortByViews) !== -1 &&
+        numberUtils.toNum(sortByViews) !== 1)
+    )
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data",
+      });
+  }
+  if (sortByLatestUpdate) {
+    if (
+      !numberUtils.isNumberic(sortByLatestUpdate) ||
+      (numberUtils.toNum(sortByLatestUpdate) !== -1 &&
+        numberUtils.toNum(sortByLatestUpdate) !== 1)
+    )
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data",
+      });
+  }
+  // if (withLatestChapter) {
+  //   if (
+  //     !numberUtils.isNumberic(withLatestChapter) ||
+  //     (numberUtils.toNum(withLatestChapter) !== -1 &&
+  //       numberUtils.toNum(withLatestChapter) !== 1)
+  //   )
+  //     return res.status(400).json({
+  //       success: false,
+  //       message: "Invalid data",
+  //     });
+  // }
   try {
     const mangas = await mangaModel.getMore(
       {},
       page,
       limit,
-      "_id name description thumbUrl rating latestUpdate authors artists transTeam genres status views"
+      "_id name description thumbUrl rating latestUpdate authors artists transTeam genres status views chapters",
+      {
+        ...(sortByViews && { views: sortByViews }),
+        ...(sortByLatestUpdate && { latestUpdate: sortByLatestUpdate }),
+      }
     );
     res.json({
       success: true,
@@ -221,7 +258,7 @@ router.put("/:id", verifyToken, async (req, res) => {
       ...(status && { status: status || 0 }),
       // latestUpdate: Date.now,
     };
-    const postUpdateCondition = { _id: req.params.id };
+    const mangaUpdateCondition = { _id: req.params.id };
     updatedManga = await Manga.findOneAndUpdate(
       postUpdateCondition,
       updatedManga,

@@ -33,7 +33,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5O
 }
 
 ###
-GET http://localhost:5000/api/manga HTTP/1.1
+GET http://localhost:5000/api/manga?page=1&limit=5 HTTP/1.1
 # Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5ODM4NDQ0MDcwZGVmMGRkZmQyOGQiLCJpYXQiOjE2OTYxNzY5NTd9.0Kk7-jwh-bFYyI2K9xeu-fkECKbB8LQS0jk5nYcpe9U
 
@@ -43,6 +43,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5O
 #     "thumbUrl": "https://m.media-amazon.com/images/M/MV5BMTMwMDM4N2EtOTJiYy00OTQ0LThlZDYtYWUwOWFlY2IxZGVjXkEyXkFqcGdeQXVyNjAwNDUxODI@._V1_.jpg"
     
 # }
+
+### GET MANGA DETAIL
+GET http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1 
 
 ###
 PUT http://localhost:5000/api/manga/651a9ef6d9e7cb19c17fcd4e HTTP/1.1
@@ -74,3 +77,21 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhO
 
 ### GET ALL GENRES
 GET http://localhost:5000/api/genre HTTP/1.1
+
+
+### ADD CHAPTER
+POST http://localhost:5000/api/chapter HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTExNmUyYzAxMDQ0NzcxYjUzYzQiLCJyb2xlIjowLCJpYXQiOjE2OTYyNDA3NDR9.qlgwo8FUChaZKEknLGq7zDYAqmqlgOxGY83b2jcX1Bk
+
+{
+    "mangaId": "651a9ef6d9e7cb19c17fcd4e",
+    "title": "Chapter.3 - Save me now"
+}
+
+### GET ALL CHAPTER
+GET http://localhost:5000/api/chapter/651a9ef6d9e7cb19c17fcd4e?page=1&limit=10 HTTP/1.1
+
+### GET ALL IMAGES OF CHAPTER
+
+GET http://localhost:5000/api/chapter/652a1346ce2f46da79476126/imgs HTTP/1.1

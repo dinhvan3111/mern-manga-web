@@ -5,6 +5,7 @@ const cors = require("cors");
 const authRouter = require("./routes/auth");
 const mangaRouter = require("./routes/manga");
 const genreRouter = require("./routes/genre");
+const chapterRouter = require("./routes/chapter");
 
 const connectDB = async () => {
   try {
@@ -28,6 +29,7 @@ app.use(cors());
 app.use("/api/auth", authRouter);
 app.use("/api/manga", mangaRouter);
 app.use("/api/genre", genreRouter);
+app.use("/api/chapter", chapterRouter);
 
 const PORT = 5000;
 

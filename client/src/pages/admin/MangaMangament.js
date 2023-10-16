@@ -10,8 +10,13 @@ import { AiFillDelete, AiFillEdit, AiFillFileAdd } from "react-icons/ai";
 import { CircularProgress, IconButton } from "@mui/material";
 import BasicPagination from "../../components/pagination/Pagination";
 import BasicButton from "../../components/button/BasicButton";
+import { SUBMIT_STATUS } from "../../common/constants";
+import usePopup from "../../hooks/usePopup";
+import PopupMsg from "../../components/popup/PopupMessage";
+import ConfirmPopup from "../../components/popup/ConfirmPopup";
+import AsyncImage from "../../components/AsyncImage";
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 5;
 
 const MangaMangament = () => {
   const navigate = useNavigate();
@@ -21,7 +26,7 @@ const MangaMangament = () => {
   const [isLoading, setIsLoading] = useState(false);
   const fetchMangaList = async (page = 1) => {
     setIsLoading(true);
-    const res = await mangaApi.getAllMangas(page, ITEMS_PER_PAGE);
+    const res = await mangaApi.getAllMangas(page, ITEMS_PER_PAGE, {});
     if (res.success) {
       console.log(res.data.docs);
       setMangaList(res.data.docs);
@@ -64,8 +69,8 @@ const MangaMangament = () => {
               />
             </div>
           ) : (
-            mangaList.map((manga) => (
-              <MangaManageItem manga={manga}></MangaManageItem>
+            mangaList.map((manga, index) => (
+              <MangaManageItem key={index} manga={manga}></MangaManageItem>
             ))
           )}
         </BasicPagination>
@@ -74,70 +79,121 @@ const MangaMangament = () => {
   );
 };
 
-const MangaManageItem = ({ manga }) => {
+const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
+  const [deleteStatus, setDeleteStatus] = useState();
+  const [popupMsg, setPopupMsg] = useState("");
   const navigate = useNavigate();
+  const {
+    open: openConfirm,
+    handleOpenPopup: handleOpenConfirmPopup,
+    handleClosePopup: handleCloseConfirmPopup,
+  } = usePopup();
+  const {
+    open: openStatus,
+    handleOpenPopup: handleOpenStatusPopup,
+    handleClosePopup: handleCloseStatusPopup,
+  } = usePopup();
+  const onDeleteManga = async () => {
+    handleCloseConfirmPopup();
+    setDeleteStatus(SUBMIT_STATUS.LOADING);
+    handleOpenStatusPopup();
+    const res = await mangaApi.deleteManga(manga._id);
+    if (res.success) {
+      setDeleteStatus(SUBMIT_STATUS.SUCCESS);
+      setPopupMsg("Delete manga successful");
+      onHasChangeMangaList();
+      return;
+    }
+    setDeleteStatus(SUBMIT_STATUS.FAILED);
+    setPopupMsg("Delete manga successful");
+  };
+  const onGoToEditPage = () => {};
   return (
-    <div className="flex gap-4 w-full bg-gray-100 p-2 rounded-md">
-      <div
-        className="max-w-[84px] min-w-[84px] h-full cursor-pointer"
-        onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
-      >
-        <img className="w-full h-full" src={manga.thumbUrl} alt="img" />
-      </div>
-      <div className="flex justify-between gap-2 w-full">
+    <>
+      <div className="flex gap-4 w-full h-fit bg-gray-100 p-2 rounded-md">
         <div
-          className="flex flex-col flex-1 gap-2 cursor-pointer"
+          className="max-w-[84px] min-w-[84px] h-full cursor-pointer"
           onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
         >
-          <div className="flex justify-between">
-            <h4 className="text-lg break-all font-bold line-clamp-1 text-ellipsis">
-              {manga.name}
-            </h4>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex gap-1 items-center">
-              <BiStar />
-              <span className="text-base ">
-                {parseFloat(manga?.rating).toFixed(1)}
-              </span>
-            </div>
-            <div className="flex gap-1 items-center">
-              <HiOutlineEye />
-              <span className="text-base">{manga?.views}</span>
-            </div>
-            <BasicTag
-              className="w-fit !bg-gray-200 font-medium"
-              showStatusDot={true}
-              mangaStatus={manga?.status}
-              label={mangaStatusToString(manga?.status)}
-            ></BasicTag>
-          </div>
-          <div className="flex gap-2">
-            {manga?.genres.map((genre, index) => (
-              <BasicTag
-                key={index}
-                className="!font-semibold text-gray-700 !bg-gray-200 text-base"
-                label={genre.name}
-              ></BasicTag>
-            ))}
-          </div>
-          <p className="text-base break-all line-clamp-2 text-ellipsis">
-            {manga.description}
-          </p>
+          <AsyncImage src={manga.thumbUrl} alt="img" />
         </div>
-        <div className="flex flex-1 items-center justify-end">
-          <IconButton>
-            <AiFillEdit color="green" />
-          </IconButton>
-          <IconButton>
-            <AiFillDelete color="red" />
-          </IconButton>
-          {/* <IconButton>
+        <div className="flex justify-between gap-2 w-full">
+          <div
+            className="flex flex-col flex-1 gap-2 cursor-pointer"
+            onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
+          >
+            <div className="flex justify-between">
+              <h4 className="text-lg break-all font-bold line-clamp-1 text-ellipsis">
+                {manga.name}
+              </h4>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex gap-1 items-center">
+                <BiStar />
+                <span className="text-base ">
+                  {parseFloat(manga?.rating).toFixed(1)}
+                </span>
+              </div>
+              <div className="flex gap-1 items-center">
+                <HiOutlineEye />
+                <span className="text-base">{manga?.views}</span>
+              </div>
+              <BasicTag
+                className="w-fit !bg-gray-200 font-medium"
+                showStatusDot={true}
+                mangaStatus={manga?.status}
+                label={mangaStatusToString(manga?.status)}
+              ></BasicTag>
+            </div>
+            <div className="flex gap-2">
+              {manga?.genres.map((genre, index) => (
+                <BasicTag
+                  key={index}
+                  className="!font-semibold text-gray-700 !bg-gray-200 text-base"
+                  label={genre.name}
+                ></BasicTag>
+              ))}
+            </div>
+            <p className="text-base break-all line-clamp-2 text-ellipsis">
+              {manga.description}
+            </p>
+          </div>
+          <div className="flex flex-1 items-center justify-end">
+            <IconButton>
+              <AiFillEdit color="green" />
+            </IconButton>
+            <IconButton onClick={handleOpenConfirmPopup}>
+              <AiFillDelete color="red" />
+            </IconButton>
+            {/* <IconButton>
             <AiFillEdit color="green" />
           </IconButton> */}
+          </div>
         </div>
       </div>
-    </div>
+      <ConfirmPopup
+        isOpen={openConfirm}
+        handleConfirm={onDeleteManga}
+        handleReject={handleCloseConfirmPopup}
+      >
+        <div>
+          Do you want to delete
+          <span className="font-semibold text-orange-500">
+            {" "}
+            {manga?.name}
+          </span>{" "}
+          ?
+        </div>
+      </ConfirmPopup>
+      <PopupMsg
+        isOpen={openStatus}
+        handleClosePopup={handleCloseStatusPopup}
+        status={deleteStatus}
+        hasOk={true}
+      >
+        {popupMsg}
+      </PopupMsg>
+    </>
   );
 };
 

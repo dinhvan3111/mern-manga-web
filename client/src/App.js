@@ -17,6 +17,7 @@ import LibraryPage from "./pages/library/LibraryPage";
 import SearchMangaPage from "./pages/manga/SearchMangaPage";
 import AddMangaPage from "./pages/admin/AddMangaPage";
 import MangaMangament from "./pages/admin/MangaMangament";
+import ReadChapter from "./pages/chapter/ReadChapter";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -86,6 +87,7 @@ function App() {
         </Route>
 
         {/*----------No layout-------------- */}
+        <Route path={PAGE_PATH.READ_CHAPTER()} element={<ReadChapter />} />
         <Route
           path={PAGE_PATH.REGISTER}
           element={<AuthPage authRoute="register" />}

@@ -32,8 +32,12 @@ const mangaApi = {
       console.log(error);
     }
   },
-  getAllMangas: async (page = 1, limit = 5) => {
-    const url = API.MANGA_ALL(page, limit);
+  getAllMangas: async (
+    page = 1,
+    limit = 5,
+    { sortByViews, sortByLatestUpdate }
+  ) => {
+    const url = API.MANGA_ALL(page, limit, sortByViews, sortByLatestUpdate);
     try {
       const res = await axiosClient.get(url);
       return res;

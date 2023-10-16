@@ -32,7 +32,8 @@ const AddMangaPage = () => {
     setValue,
     getValues,
     watch,
-    formState: { isSubmitting, errors },
+    reset,
+    formState: { isSubmitting, errors, isDirty, isSubmitSuccessful },
   } = useForm({ resolver: yupResolver(addMangaSchema) });
   const watchFile = watch("thumbnail");
   const [genres, setGenres] = useState([]);
@@ -46,7 +47,6 @@ const AddMangaPage = () => {
   } = usePopup();
 
   const handleChange = (event) => {
-    console.log("change");
     const {
       target: { value },
     } = event;
@@ -61,6 +61,11 @@ const AddMangaPage = () => {
     }
     setIsFetchingGenres(false);
   };
+  const resetFileds = () => {
+    if (SUBMIT_STATUS.FAILED) return;
+    reset();
+    setSelectedGenres([]);
+  };
   const onSubmit = async (data) => {
     handleOpenAddStatusModal();
     setAddMangaStatus(SUBMIT_STATUS.LOADING);
@@ -72,6 +77,7 @@ const AddMangaPage = () => {
     Object.keys(files).forEach((key) =>
       formData.append(files.item(key).name, files.item(key))
     );
+    console.log("formData", formData);
     try {
       const submitData = {
         name: data.name,
@@ -104,8 +110,14 @@ const AddMangaPage = () => {
     }
   };
   useEffect(() => {
+    resetFileds();
+  }, [isSubmitSuccessful]);
+  useEffect(() => {
     fetchGenres();
   }, []);
+  useEffect(() => {
+    console.log(isDirty);
+  }, [isDirty]);
   return (
     <>
       <div className="page-wrapper">
@@ -285,7 +297,12 @@ const AddMangaPage = () => {
                 </div>
               </div>
               <div className="mt-10 flex justify-center w-full">
-                <BasicButton className="!w-fit" type="submit">
+                <BasicButton
+                  disabled={!isDirty}
+                  loading={isSubmitting}
+                  className="!w-fit"
+                  type="submit"
+                >
                   Submit
                 </BasicButton>
               </div>

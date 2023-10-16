@@ -37,9 +37,9 @@ const BasicButton = ({
       startIcon={icon}
       onClick={onClick}
       sx={[...(Array.isArray(sx) ? sx : [sx])]}
-      className={`!normal-case text-base !font-bold w-full ${buttonStyle(
-        buttonType
-      )}  ${color} ${className} ${disabled && disableStyle}`}
+      className={`!normal-case text-base !font-bold w-full ${
+        !disabled && buttonStyle(buttonType)
+      }  ${!disabled && color} ${className} ${disabled && disableStyle}`}
       disabled={disabled}
       loading={loading}
       {...props}

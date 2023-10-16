@@ -10,31 +10,51 @@ import { Skeleton } from "@mui/material";
 import { dateToTs, getDateDiff } from "../util/timeHelper";
 import { useNavigate } from "react-router-dom";
 import { PAGE_PATH } from "../routes/page-path";
-const ITEMS_PER_COL = 6;
+
+const RECENT_MANGA_ITEMS_PER_PAGE = 18;
+const RECENT_MANGA_ITEMS_PER_COL = 6;
 const MAX_COL = 3;
+const POPULAR_ITEMS_PER_PAGE = 5;
 
 const HomePage = () => {
   const [recentUpdateMangas, setRecentUpdateMangas] = useState([]);
   const renderRecentManga = (data) => {
     const recentMangaContainers = [];
-    const cols = Math.floor(data.length / ITEMS_PER_COL) + 1;
+    const cols = Math.floor(data.length / RECENT_MANGA_ITEMS_PER_COL) + 1;
     var startIndex = 0;
-    var endIndex = ITEMS_PER_COL;
+    var endIndex = RECENT_MANGA_ITEMS_PER_COL;
     for (let i = 0; i < cols; i++) {
       const subItems = data.slice(startIndex, endIndex);
       recentMangaContainers.push([...subItems]);
-      startIndex += ITEMS_PER_COL;
-      endIndex += ITEMS_PER_COL;
+      startIndex += RECENT_MANGA_ITEMS_PER_COL;
+      endIndex += RECENT_MANGA_ITEMS_PER_COL;
     }
     setRecentUpdateMangas(recentMangaContainers);
     // return recentMangaContainers;
   };
   const {
+    data: popularManga,
+    isLoading: isLoadingPopularManga,
+    isFetched: isFetchedPopularManga,
+  } = useQuery(reactQueryKey.POPULAR_MANGA, async () => {
+    const res = await mangaApi.getAllMangas(1, POPULAR_ITEMS_PER_PAGE, {
+      sortByViews: -1,
+    });
+    console.log(res);
+    if (res.success) {
+      return res.data.docs;
+    } else {
+      return [];
+    }
+  });
+  const {
     data: mangaList,
     isLoading,
     isFetched,
   } = useQuery(reactQueryKey.ALL_MANGA, async () => {
-    const res = await mangaApi.getAllMangas(1, 5);
+    const res = await mangaApi.getAllMangas(1, RECENT_MANGA_ITEMS_PER_PAGE, {
+      sortByLatestUpdate: -1,
+    });
     console.log(res);
     if (res.success) {
       return res.data.docs;
@@ -59,8 +79,8 @@ const HomePage = () => {
       <div className="">
         <h1 className="text-3xl">Popular New Titles</h1>
         <BasicBannerCarousel
-          isLoading={isLoading}
-          data={mangaList}
+          isLoading={isLoadingPopularManga}
+          data={popularManga}
           itemComponent={(item, index) => (
             <BasicBannerCarouselItem
               key={index}
@@ -81,7 +101,7 @@ const HomePage = () => {
                     key={index}
                     className="bg-gray-100 rounded-sm flex flex-col gap-4 p-4 "
                   >
-                    {Array(ITEMS_PER_COL)
+                    {Array(RECENT_MANGA_ITEMS_PER_COL)
                       .fill(0)
                       .map((item, index) => (
                         <BasicMangaEntitySekelton key={index} />
@@ -155,8 +175,9 @@ const BasicMangaEntity = ({ manga, ...props }) => {
             {manga.name}
           </h4>
           <p className="text-base break-all line-clamp-1 text-ellipsis">
-            Ch.3 - Drunken confession
-            Drunkenconfessionfqwfqwmfqwkljfkwqkfjkqwjfkjwqklfjklqwjfklqwjklfjqw
+            {manga.chapters.length > 0
+              ? manga.chapters[0].title
+              : "No chapters yet"}
           </p>
         </div>
         <div className="flex justify-between items-center">
