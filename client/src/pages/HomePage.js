@@ -10,6 +10,7 @@ import { Skeleton } from "@mui/material";
 import { dateToTs, getDateDiff } from "../util/timeHelper";
 import { useNavigate } from "react-router-dom";
 import { PAGE_PATH } from "../routes/page-path";
+import AsyncImage from "../components/AsyncImage";
 
 const RECENT_MANGA_ITEMS_PER_PAGE = 18;
 const RECENT_MANGA_ITEMS_PER_COL = 6;
@@ -131,8 +132,7 @@ const BasicMangaEntitySekelton = ({ ...props }) => {
   return (
     <div className="flex gap-4 w-full" {...props}>
       <div className="max-w-[56px] min-w-[56px] h-20">
-        <Skeleton variant="rectangular" className="!h-full"></Skeleton>
-        {/* <img className="w-full h-full" src={manga.imgUrl} alt="img" /> */}
+        <Skeleton variant="rounded" className="!h-full"></Skeleton>
       </div>
       <div className="flex flex-col gap-2 grow w-full">
         <h4 className="text-base break-all font-bold line-clamp-1 text-ellipsis">
@@ -159,15 +159,15 @@ const BasicMangaEntity = ({ manga, ...props }) => {
         className="max-w-[56px] min-w-[56px] h-20 cursor-pointer"
         onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
       >
-        <img
-          className="w-full h-full"
+        <AsyncImage
+          alt="img"
+          skeletonHeight={80}
           src={
             manga.thumbUrl !== ""
               ? manga.thumbUrl
               : "/images/no_manga_thumb.png"
           }
-          alt="img"
-        />
+        ></AsyncImage>
       </div>
       <div className="flex flex-col gap-2 grow w-full">
         <div

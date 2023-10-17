@@ -9,6 +9,7 @@ import mangaApi from "../api/mangaApi";
 import BasicTag from "./tag/BasicTag";
 import { mangaStatusToString } from "../util/stringHelper";
 import { HiOutlineEye } from "react-icons/hi";
+import AsyncImage from "./AsyncImage";
 
 const BasicAppBar = ({
   leftDrawerOpen,
@@ -56,17 +57,8 @@ const BasicAppBar = ({
           className="px-4 py-2 flex gap-4 justify-start items-center cursor-pointer bg-gray-100 hover:bg-gray-200"
           onClick={() => onSearchItemClick(item)}
         >
-          <div className="shadow-lg">
-            <img
-              // src={
-              //   item.image !== null && item.image !== undefined
-              //     ? item?.thumbUrl
-              //     : thumbDefaultCourse
-              // }
-              src={item?.thumbUrl}
-              alt="courseThumb"
-              className="h-full w-16 object-contain"
-            />
+          <div className="shadow-lg w-16 h-full">
+            <AsyncImage src={item?.thumbUrl} alt="courseThumb" />
           </div>
           <div className="flex flex-col gap-2">
             <span className="font-bold">{item.name}</span>

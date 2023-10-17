@@ -17,6 +17,10 @@ export const API = {
   SEARCH_MANGA: (key, page, limit) =>
     `/api/manga/search?key=${key}&page=${page}&limit=${limit}`,
   UPLOAD_FILE: (id) => `/api/manga/uploadThumb/${id}`,
+  ADD_MANGA_TO_LIBRARY: "/api/favourite",
+  REMOVE_MANGA_FROM_LIBRARY: (id) => `/api/favourite/${id}`,
+  GET_LIST_MANGA_IN_LIBRARY: (page, limit) =>
+    `/api/favourite?page=${page}&limit=${limit}`,
 
   // ===========GENRE===============
   GENRE_ALL: "/api/genre",

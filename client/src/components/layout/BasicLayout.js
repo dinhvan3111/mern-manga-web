@@ -49,11 +49,11 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 const accordionFollowingvOptions = [
-  {
-    value: ACCORDION_NAV_OPTION.FOLLOWING.UPDATE,
-    title: "Updates",
-    path: "/update",
-  },
+  // {
+  //   value: ACCORDION_NAV_OPTION.FOLLOWING.UPDATE,
+  //   title: "Updates",
+  //   path: "/update",
+  // },
   {
     value: ACCORDION_NAV_OPTION.FOLLOWING.LIBRARY,
     title: "Library",
@@ -162,7 +162,7 @@ const BasicDrawer = ({ open, setOpen }) => {
                   <DrawerTab key={item.value} item={item} />
                 ))
               : accordionFollowingvOptions.map((item) => (
-                  <DrawerTab item={item} />
+                  <DrawerTab key={item.value} item={item} />
                 ))}
           </div>
         </div>

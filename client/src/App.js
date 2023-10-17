@@ -41,7 +41,12 @@ function App() {
         {/* ---------White background layout----------------- */}
         <Route path="/" element={<BasicLayout />}>
           <Route path={PAGE_PATH.HOME} element={<HomePage />} />
-          <Route path={PAGE_PATH.LIBRARY} element={<LibraryPage />} />
+          <Route
+            path={PAGE_PATH.LIBRARY}
+            element={<ProtectedRoute pageRole={[ROLE.AUTHOR, ROLE.USER]} />}
+          >
+            <Route path={PAGE_PATH.LIBRARY} element={<LibraryPage />}></Route>
+          </Route>
           <Route
             path={PAGE_PATH.SEARCH_MANGA()}
             element={<SearchMangaPage />}

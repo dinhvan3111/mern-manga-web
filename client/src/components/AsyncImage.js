@@ -6,9 +6,10 @@ const AsyncImage = ({
   width,
   height,
   skeletonWidth = "100%",
-  skeletonHeight = "100%",
+  skeletonHeight = 110,
   size,
   alt,
+  borderRadius = "4px",
   ...props
 }) => {
   const [loading, setLoading] = useState(true);
@@ -27,6 +28,7 @@ const AsyncImage = ({
           width: "100%",
           animation: "fadeIn 0.5s",
           height: "100%",
+          borderRadius: borderRadius,
         }}
         onLoad={(e) => {
           setLoading(false);
@@ -35,10 +37,12 @@ const AsyncImage = ({
       ></img>
       {loading && (
         <Skeleton
+          variant="rectangular"
           style={{
             width: skeletonWidth ? skeletonWidth : "100%",
-            height: skeletonHeight ? skeletonHeight : "100%",
+            borderRadius: borderRadius,
           }}
+          height={skeletonHeight}
         ></Skeleton>
       )}
     </div>

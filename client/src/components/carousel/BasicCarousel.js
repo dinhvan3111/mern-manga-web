@@ -4,6 +4,7 @@ import BasicTag from "../tag/BasicTag";
 import { useNavigate } from "react-router-dom";
 import { PAGE_PATH } from "../../routes/page-path";
 import { Skeleton } from "@mui/material";
+import AsyncImage from "../AsyncImage";
 
 const BasicBannerCarousel = ({
   data,
@@ -46,12 +47,15 @@ export const BasicBannerCarouselItem = ({ item, index }) => {
       className={`h-72 bg-gray-200 rounded-md bg-[image:var(--image-url)] bg-no-repeat bg-cover bg-center`}
     >
       <div className="px-4 py-4 w-full h-full flex gap-4 backdrop-blur-lg bg-white/90">
-        <img
+        {/* <img
           onClick={() => navigate(`${PAGE_PATH.MANGA_DETAIL(item?._id)}`)}
           className="w-48 object-contain cursor-pointer"
           src={item?.thumbUrl}
           alt="img"
-        />
+        /> */}
+        <div className="w-48">
+          <AsyncImage src={item?.thumbUrl} skeletonHeight={256} alt="img" />
+        </div>
         <div className="w-full flex flex-col justify-between">
           <div>
             <h3

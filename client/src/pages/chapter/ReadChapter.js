@@ -123,7 +123,7 @@ const ReadChapter = () => {
             className="basis-1/3 cursor-pointer"
             onClick={previousPage}
           ></div>
-          <div className=" flex">
+          <div className=" flex select-none">
             {chapter?.listImgUrl.map((item, index) => (
               <img
                 src={item}

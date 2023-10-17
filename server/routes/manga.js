@@ -3,6 +3,7 @@ const router = express.Router();
 const verifyToken = require("../middleware/auth.middleware");
 
 const Manga = require("../models/manga");
+const FavouriteManga = require("../models/favouriteManga");
 const { ROLE } = require("../utils/database");
 const mangaModel = require("../models/manga.model");
 const numberUtils = require("../utils/numberUtils");
@@ -206,16 +207,29 @@ router.get("/search", async (req, res) => {
 
 // @route GET api/manga/id
 // @desc Get manga by id
-// @access Private
+// @access Public
 
 router.get("/:id", async (req, res) => {
   try {
     const manga = await Manga.findOne({ _id: req.params.id }).populate(
       "genres"
     );
+    if (!manga) {
+      return res.status(401).json({
+        success: false,
+        message: "Manga not found",
+      });
+    }
+    let mangaObj = manga.toObject();
+    const isInFavourite = await FavouriteManga.findOne({
+      user: req?.user?.userId,
+      manga: req.params.id,
+    });
+    console.log("isInFav", isInFavourite);
+    mangaObj.isInFavourite = isInFavourite ? true : false;
     res.json({
       success: true,
-      data: { manga },
+      data: { manga: mangaObj },
     });
   } catch (error) {
     console.log(error);

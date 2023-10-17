@@ -15,7 +15,7 @@ router.post("/", verifyToken, async (req, res) => {
   if (!name) {
     return res.status(400).json({
       success: false,
-      message: "Genre name are required",
+      message: "Genre name is required",
     });
   }
   try {

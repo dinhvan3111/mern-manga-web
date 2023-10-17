@@ -80,5 +80,35 @@ const mangaApi = {
       console.log(error);
     }
   },
+  addMangaToLibrary: async (mangaId) => {
+    const url = API.ADD_MANGA_TO_LIBRARY;
+    const data = {
+      mangaId,
+    };
+    try {
+      const res = await axiosClient.post(url, data);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  removeMangaFromLibrary: async (mangaId) => {
+    const url = API.REMOVE_MANGA_FROM_LIBRARY(mangaId);
+    try {
+      const res = await axiosClient.delete(url);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  getListMangaInLib: async (page = 1, limit = 10) => {
+    const url = API.GET_LIST_MANGA_IN_LIBRARY(page, limit);
+    try {
+      const res = await axiosClient.get(url);
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 export default mangaApi;

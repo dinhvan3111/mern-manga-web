@@ -9,6 +9,9 @@ import store, { persistor } from "./redux-toolkit/configureStore";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { disableReactDevTools } from "@fvilers/disable-react-devtools";
+
+// if (process.evn.NODE_ENV === "production") disableReactDevTools();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

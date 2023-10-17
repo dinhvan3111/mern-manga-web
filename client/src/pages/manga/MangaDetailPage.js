@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import BasicAppBar from "../../components/BasicAppBar";
 import BasicTag from "../../components/tag/BasicTag";
 import BasicButton, { BUTTON_TYPE } from "../../components/button/BasicButton";
 import { BiBookOpen, BiStar, BiTimeFive } from "react-icons/bi";
+import { RiCheckLine } from "react-icons/ri";
 import {
   HiOutlineSortAscending,
   HiOutlineSortDescending,
@@ -12,10 +12,12 @@ import mangaApi from "../../api/mangaApi";
 import { CircularProgress, Skeleton, Typography } from "@mui/material";
 import { mangaStatusToString } from "../../util/stringHelper";
 import { MANGA_STATUS, SORT_CHAPTER } from "../../common/constants";
-import AsyncImage from "../../components/AsyncImage";
 import chapterApi from "../../api/chapterApi";
 import { dateToTs, getDateDiff } from "../../util/timeHelper";
 import { PAGE_PATH } from "../../routes/page-path";
+import { toast } from "react-toastify";
+import AsyncImage from "../../components/AsyncImage";
+import { useSelector } from "react-redux";
 
 const MangaDetailPage = () => {
   const { id } = useParams();
@@ -168,6 +170,8 @@ const MangaDetailContent = ({
   setCurrentSortChapter,
   ...props
 }) => {
+  const { user } = useSelector((state) => state.auth);
+  const [addLibLoading, setAddLibLoading] = useState(false);
   const navigate = useNavigate();
   const renderMangaStatusColor = (status) => {
     switch (status) {
@@ -187,6 +191,28 @@ const MangaDetailContent = ({
   const handleSortChapter = (value) => {
     setCurrentSortChapter(value);
   };
+  const addToLib = async () => {
+    if (!user.data) {
+      navigate(PAGE_PATH.LOGIN);
+      return;
+    }
+    setAddLibLoading(true);
+    const res = await mangaApi.addMangaToLibrary(manga?._id);
+    if (res.success) {
+      manga.isInFavourite = true;
+      toast.success("Manga has been added to library");
+    }
+    setAddLibLoading(false);
+  };
+  const removeFromLib = async () => {
+    setAddLibLoading(true);
+    const res = await mangaApi.removeMangaFromLibrary(manga?._id);
+    if (res.success) {
+      manga.isInFavourite = false;
+      toast.success("Removed manga from library");
+    }
+    setAddLibLoading(false);
+  };
   return (
     <div
       style={{
@@ -195,68 +221,85 @@ const MangaDetailContent = ({
       }}
       className={`bg-[image:var(--image-url)] bg-fixed bg-no-repeat bg-cover bg-center  `}
     >
-      <div className="backdrop-blur-lg h-full bg-black/20 pt-52">
+      <div className="backdrop-blur-lg h-full bg-gradient-to-r from-black/70 to-white/20 pt-52">
         <div className="mt-20">
           <div className="relative backdrop-blur-lg h-full bg-white/[100%]">
             <div className="page-wrapper">
-              <div className="absolute -top-52 flex gap-4">
-                <img
-                  className="w-52 h-full object-contain cursor-pointer"
-                  src={manga?.thumbUrl}
-                  alt="thumb"
-                ></img>
-                {/* <AsyncImage
-                  className="!w-52 h-full object-contain cursor-pointer"
-                  src={manga.thumbUrl}
-                  alt="img"
-                /> */}
-                <div className="flex flex-col justify-between">
-                  <div className="">
-                    <h3
-                      className="h-[154px] font-bold text-white text-7xl cursor-pointer line-clamp-2 drop-shadow-lg"
-                      //   onClick={() => navigate(`${PAGE_PATH.MANGA_DETAIL(1)}`)}
-                    >
-                      {manga?.name}
-                    </h3>
-                    <h4 className="mt-4 text-white text-lg font-semibold">
-                      {manga?.authors.join(", ")}
-                    </h4>
+              <div className="absolute -top-52 w-full flex">
+                <div className="basis-1/6">
+                  <div className="bg-white rounded-md w-52 drop-shadow-xl">
+                    <AsyncImage
+                      src={manga.thumbUrl}
+                      skeletonHeight={300}
+                      alt="img"
+                    />
                   </div>
-                  <div className="pt-10">
-                    <div className="flex h-14 gap-4 w-fit">
-                      <BasicButton className="!w-60 !text-lg">
-                        Add To Library
-                      </BasicButton>
-                      <BasicButton
-                        disabled={chapters?.length === 0}
-                        onClick={handleStartReading}
-                        className="!w-60 !text-lg !bg-gray-100"
-                        buttonType={BUTTON_TYPE.NO_COLOR}
-                        icon={<BiBookOpen size={30} />}
+                </div>
+                <div className="basis-5/6">
+                  <div className="flex flex-col w-full justify-between">
+                    <div className="">
+                      <h3
+                        className="h-[154px] font-bold text-white text-7xl cursor-pointer line-clamp-2 drop-shadow-lg"
+                        //   onClick={() => navigate(`${PAGE_PATH.MANGA_DETAIL(1)}`)}
                       >
-                        Start Reading
-                      </BasicButton>
+                        {manga?.name}
+                      </h3>
+                      <h4 className="mt-4 text-white text-lg font-semibold">
+                        {manga?.authors.join(", ")}
+                      </h4>
                     </div>
-                    <div className="mt-2 flex gap-1">
-                      {manga?.genres.map((genre) => (
+                    <div className="pt-10">
+                      <div className="flex h-14 gap-4 w-fit">
+                        {manga.isInFavourite ? (
+                          <BasicButton
+                            loading={addLibLoading}
+                            className="!w-60 !text-lg"
+                            icon={<RiCheckLine size={40} />}
+                            onClick={removeFromLib}
+                          >
+                            In library
+                          </BasicButton>
+                        ) : (
+                          <BasicButton
+                            loading={addLibLoading}
+                            className="!w-60 !text-lg"
+                            onClick={addToLib}
+                          >
+                            Add To Library
+                          </BasicButton>
+                        )}
+                        <BasicButton
+                          disabled={chapters?.length === 0}
+                          onClick={handleStartReading}
+                          className="!w-60 !text-lg !bg-gray-100"
+                          buttonType={BUTTON_TYPE.NO_COLOR}
+                          icon={<BiBookOpen size={30} />}
+                        >
+                          Start Reading
+                        </BasicButton>
+                      </div>
+                      <div className="mt-2 flex gap-1">
+                        {manga?.genres.map((genre) => (
+                          <BasicTag
+                            key={genre._id}
+                            className="!font-bold text-gray-700 p-1"
+                            label={genre.name}
+                          ></BasicTag>
+                        ))}
                         <BasicTag
+                          showStatusDot={true}
+                          statusDotColor={renderMangaStatusColor(manga?.status)}
                           className="!font-bold text-gray-700 p-1"
-                          label={genre.name}
+                          label={mangaStatusToString(manga?.status)}
                         ></BasicTag>
-                      ))}
-                      <BasicTag
-                        showStatusDot={true}
-                        statusDotColor={renderMangaStatusColor(manga?.status)}
-                        className="!font-bold text-gray-700 p-1"
-                        label={mangaStatusToString(manga?.status)}
-                      ></BasicTag>
-                    </div>
-                    <div className="mt-2">
-                      <div className="flex gap-2 items-center">
-                        <BiStar size={20} color="orange" />
-                        <span className="text-lg text-orange-500">
-                          {parseFloat(manga?.rating).toFixed(1)}
-                        </span>
+                      </div>
+                      <div className="mt-2">
+                        <div className="flex gap-2 items-center">
+                          <BiStar size={20} color="orange" />
+                          <span className="text-lg text-orange-500">
+                            {parseFloat(manga?.rating).toFixed(1)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
