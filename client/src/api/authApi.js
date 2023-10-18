@@ -11,10 +11,13 @@ const authApi = {
     const url = API.LOGIN;
     return axiosClient.post(url, data);
   },
-  // refreshToken: () => {
-  //   const url = API.REFRESH_TOKEN;
-  //   return axiosClient.post(url);
-  // },
+  refreshToken: (refreshToken) => {
+    const data = {
+      refreshToken,
+    };
+    const url = API.REFRESH_TOKEN;
+    return axiosClient.post(url, data);
+  },
 };
 
 export default authApi;

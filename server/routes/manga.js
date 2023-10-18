@@ -215,7 +215,7 @@ router.get("/:id", async (req, res) => {
       "genres"
     );
     if (!manga) {
-      return res.status(401).json({
+      return res.status(400).json({
         success: false,
         message: "Manga not found",
       });

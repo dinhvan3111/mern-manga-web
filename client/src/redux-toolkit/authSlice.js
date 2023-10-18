@@ -13,6 +13,7 @@ const authSlice = createSlice({
           data: payload.user,
           token: {
             accessToken: payload.accessToken,
+            refreshToken: payload.refreshToken,
             isExpired: false,
           },
         },
@@ -23,9 +24,31 @@ const authSlice = createSlice({
       ...state,
       user: {},
     }),
+    updateToken: (state, { payload }) => ({
+      ...state,
+      user: {
+        ...state.user,
+        token: {
+          accessToken: payload.accessToken,
+          refreshToken: payload.refreshToken,
+          isExpired: false,
+        },
+      },
+    }),
+    invalidateToken: (state) => ({
+      ...state,
+      user: {
+        ...state.user,
+        token: {
+          ...state.user.token,
+          isExpired: true,
+        },
+      },
+    }),
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, invalidateToken, updateToken } =
+  authSlice.actions;
 
 export default authSlice.reducer;

@@ -7,7 +7,7 @@ Content-type: application/json
     "role": 1
 }
 
-###
+### LOGIN
 POST http://localhost:5000/api/auth/login HTTP/1.1
 content-type: application/json
 
@@ -16,7 +16,15 @@ content-type: application/json
     "password": "123"
 }
 
-###
+### REFRESH TOKEN
+POST http://localhost:5000/api/auth/refresh HTTP/1.1
+content-type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTE0M2UyYzAxMDQ0NzcxYjUzYzciLCJyb2xlIjoyLCJpYXQiOjE2OTc1NTc0MDYsImV4cCI6MTY5NzczMDIwNn0.-DjZNhzikPzk0sgX7YssrXxBa5BKVNXkQ3bLtnD5lNs"
+}
+
+### ADD MANGA
 POST http://localhost:5000/api/manga HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTE5ODM4NDQ0MDcwZGVmMGRkZmQyOGQiLCJpYXQiOjE2OTYxNzY5NTd9.0Kk7-jwh-bFYyI2K9xeu-fkECKbB8LQS0jk5nYcpe9U

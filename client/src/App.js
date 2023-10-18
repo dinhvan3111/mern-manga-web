@@ -25,8 +25,8 @@ function App() {
   const navigate = useNavigate();
   useEffect(() => {
     function handleExprTok() {
-      if (user.data && user.tokenExpr === true) {
-        toast.warn("Phiên đăng nhập hết hạn");
+      if (user.data && user.token.isExpired === true) {
+        toast.warn("Login session expired");
         // signOut(user?.curFCMToken?.token);
 
         dispatch(logout());
@@ -34,7 +34,7 @@ function App() {
       }
     }
     handleExprTok();
-  }, [user.isExpired]);
+  }, [user?.token]);
   return (
     <>
       <Routes>

@@ -6,6 +6,46 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const verifyToken = require("../middleware/auth.middleware");
 
+function generateAccessToken(user) {
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: process.env.ACCESS_TOKEN_EXP,
+  });
+}
+function generateRefreshToken(user) {
+  return jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXP,
+  });
+}
+
+// @route GET api/auth/refresh
+// @desc Refresh jwt token
+// @access Public
+router.post("/refresh", async (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  if (!refreshToken) {
+    return res
+      .status(401)
+      .json({ success: true, message: "Refresh token is required" });
+  }
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (err)
+      return res.status(406).json({
+        success: false,
+        message: "Refresh token is not valid or expired",
+      });
+    // Correct token we send a new access token
+    const accessToken = generateAccessToken({
+      userId: user.userId,
+      role: user.role,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user.userId,
+      role: user.role,
+    });
+    return res.json({ success: true, data: { accessToken, refreshToken } });
+  });
+});
+
 // @route GET api/auth/register
 // @desc Check if user is logged in
 // @access Public
@@ -53,16 +93,14 @@ router.post("/register", async (req, res) => {
     });
     await newUser.save();
     // Return token
-    const accessToken = jwt.sign(
-      { userId: newUser._id, role: newUser.role },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_EXP }
-    );
-    const refreshToken = jwt.sign(
-      { userId: newUser._id, role: newUser.role },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXP }
-    );
+    const accessToken = generateAccessToken({
+      userId: newUser._id,
+      role: newUser.role,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: newUser._id,
+      role: newUser.role,
+    });
     res.json({
       success: true,
       message: "User created successfully",
@@ -105,16 +143,14 @@ router.post("/login", async (req, res) => {
     }
     // All good
     // Return token
-    const accessToken = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_EXP }
-    );
-    const refreshToken = jwt.sign(
-      { userId: user._id, role: user.role },
-      process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXP }
-    );
+    const accessToken = generateAccessToken({
+      userId: user._id,
+      role: user.role,
+    });
+    const refreshToken = generateRefreshToken({
+      userId: user._id,
+      role: user.role,
+    });
     // Remove password
     const returnUser = JSON.parse(JSON.stringify(user));
     delete returnUser["password"];

@@ -2,6 +2,8 @@ import axios from "axios";
 import queryString from "query-string";
 import store from "../redux-toolkit/configureStore";
 import Config from "../configuration/config";
+import { invalidateToken, updateToken } from "../redux-toolkit/authSlice";
+import authApi from "./authApi";
 
 // Set up default config for http requests here
 // Please have a look at here `https://github.com/axios/axios#request- config` for the full list of configs
@@ -30,13 +32,28 @@ axiosClient.interceptors.response.use(
 
     return response;
   },
-  (error) => {
+  async (error) => {
     // Handle errors
-    if (error && error.response) {
-      return error.response.data;
+    const originalRequest = error.config;
+    // Handle if the accesstoken is expired then refresh the tokens
+    if (error.response.status === 403 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const oldRefreshToken = store.getState()?.auth?.user?.token.refreshToken;
+      const res = await authApi.refreshToken(oldRefreshToken);
+      if (!res.success) return error.response.data;
+      store.dispatch(updateToken(res.data));
+      originalRequest.headers = {
+        ...originalRequest.headers,
+        authorization: `Bearer ${res?.data.accessToken}`,
+      };
+      // axios.defaults.headers.Authorization = "Bearer " + res.accessToken;
+      return axiosClient(originalRequest);
     }
-
-    throw error;
+    if (error.response.status === 406 && !originalRequest._retry) {
+      store.dispatch(invalidateToken());
+    }
+    // return Promise.reject(error);
+    return error.response.data;
   }
 );
 
