@@ -226,14 +226,19 @@ router.get("/:id", async (req, res) => {
     // Check if authorized then set isInFavourite
     const authHeader = req.header("Authorization");
     const token = authHeader && authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     let userId;
-    try {
-      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-      userId = decoded.userId;
-    } catch (error) {
-      console.log(error);
-      userId = null;
+    if (!token) userId = null;
+    else {
+      try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        userId = decoded.userId;
+      } catch (error) {
+        return res.status(403).json({
+          success: false,
+          message: "Access token expires",
+        });
+        // userId = null;
+      }
     }
     if (!userId) mangaObj.isInFavourite = false;
     else {
