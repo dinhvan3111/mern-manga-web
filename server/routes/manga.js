@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const verifyToken = require("../middleware/auth.middleware");
 
 const Manga = require("../models/manga");
@@ -221,12 +222,28 @@ router.get("/:id", async (req, res) => {
       });
     }
     let mangaObj = manga.toObject();
-    const isInFavourite = await FavouriteManga.findOne({
-      user: req?.user?.userId,
-      manga: req.params.id,
-    });
-    console.log("isInFav", isInFavourite);
-    mangaObj.isInFavourite = isInFavourite ? true : false;
+
+    // Check if authorized then set isInFavourite
+    const authHeader = req.header("Authorization");
+    const token = authHeader && authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    let userId;
+    try {
+      const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      userId = decoded.userId;
+    } catch (error) {
+      console.log(error);
+      userId = null;
+    }
+    if (!userId) mangaObj.isInFavourite = false;
+    else {
+      const isInFavourite = await FavouriteManga.findOne({
+        user: userId,
+        manga: req.params.id,
+      });
+      mangaObj.isInFavourite = isInFavourite ? true : false;
+    }
+
     res.json({
       success: true,
       data: { manga: mangaObj },
