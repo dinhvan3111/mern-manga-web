@@ -59,7 +59,6 @@ const HomePage = () => {
     const res = await mangaApi.getAllMangas(1, RECENT_MANGA_ITEMS_PER_PAGE, {
       sortByLatestUpdate: -1,
     });
-    console.log(res);
     if (res.success) {
       return res.data.docs;
     } else {

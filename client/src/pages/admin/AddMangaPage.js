@@ -77,7 +77,6 @@ const AddMangaPage = () => {
     Object.keys(files).forEach((key) =>
       formData.append(files.item(key).name, files.item(key))
     );
-    console.log("formData", formData);
     try {
       const submitData = {
         name: data.name,
@@ -89,7 +88,6 @@ const AddMangaPage = () => {
         genres: listSelectedGenreIds,
       };
       const createRes = await mangaApi.addManga(submitData);
-      console.log("creat", createRes);
       if (createRes.success) {
         const uploadThumbRes = await mangaApi.uploadMangaThumb(
           createRes.manga._id,
@@ -110,15 +108,11 @@ const AddMangaPage = () => {
     }
   };
   useEffect(() => {
-    console.log("is Submit successful");
     resetFileds();
   }, [isSubmitSuccessful]);
   useEffect(() => {
     fetchGenres();
   }, []);
-  useEffect(() => {
-    console.log(isDirty);
-  }, [isDirty]);
   return (
     <>
       <div className="page-wrapper">

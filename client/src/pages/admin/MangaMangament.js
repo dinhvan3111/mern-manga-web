@@ -28,7 +28,6 @@ const MangaMangament = () => {
     setIsLoading(true);
     const res = await mangaApi.getAllMangas(page, ITEMS_PER_PAGE, {});
     if (res.success) {
-      console.log(res.data.docs);
       setMangaList(res.data.docs);
       setCurrentPage(res.data.page);
       setTotalPage(res.data.totalPages);

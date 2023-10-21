@@ -24,7 +24,6 @@ const ReadChapter = () => {
       setIsLoading(true);
       const res = await chapterApi.getAllImgsOfChapter(chapterId);
       if (res.success) {
-        console.log(res);
         setChapter(res.data);
       }
       setIsLoading(false);
@@ -149,7 +148,6 @@ const ReadChapter = () => {
 
 const NavigationPageBar = ({ chapter, currentPage }) => {
   const navigate = useNavigate();
-  console.log(currentPage);
   return (
     <div className="flex items-center justify-center fixed bottom-0 transition-all h-10 hover:h-20 bg-transparent w-full">
       <div className="px-4 flex gap-1 w-full">

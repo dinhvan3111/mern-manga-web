@@ -46,7 +46,6 @@ const SearchMangaPage = () => {
     setSearchKeyword(value);
     const res = await mangaApi.searchMangaByKey(value, page, ITEMS_PER_PAGE);
     if (res.success) {
-      console.log(res);
       setSearchResult(res.data.docs);
       setCurrentPage(res.data.page);
       setTotalPage(res.data.totalPages);

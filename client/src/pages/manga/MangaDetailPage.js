@@ -32,7 +32,6 @@ const MangaDetailPage = () => {
     window.scrollTo(0, 0);
   }, []);
   useEffect(() => {
-    console.log("useEffect");
     const fetchMangaDetail = async (id) => {
       setIsLoading(true);
       const res = await mangaApi.getMangaById(id);
