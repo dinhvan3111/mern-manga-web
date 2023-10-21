@@ -4,6 +4,8 @@ import { MANGA_ENTITY_UI } from "../common/constants";
 import { useState } from "react";
 import SearchResultItem from "../components/mangaEntity/SearchResultItem";
 import MangaThumbnailCoverItem from "../components/mangaEntity/MangaThumbnailCoverItem";
+import { useDispatch, useSelector } from "react-redux";
+import { changeMangaUI } from "../redux-toolkit/mangaEntityUISlice";
 
 const mangaEntityUIType = [
   {
@@ -17,10 +19,15 @@ const mangaEntityUIType = [
 ];
 
 const useMangaEntityOptions = () => {
+  const { mangaEntityUI } = useSelector((state) => state.mangaUI);
+  const dispatch = useDispatch();
   const [listManga, setListManga] = useState([]);
-  const [selectedMangaEntityUI, setSelectedMangaEntityUI] = useState(
-    MANGA_ENTITY_UI.LIST
-  );
+  const [selectedMangaEntityUI, setSelectedMangaEntityUI] =
+    useState(mangaEntityUI);
+  const changeMangaEntityUI = (value) => {
+    setSelectedMangaEntityUI(value);
+    dispatch(changeMangaUI({ value: value }));
+  };
   const renderMangaEntityUI = (type) => {
     switch (type) {
       case MANGA_ENTITY_UI.LIST:
@@ -51,7 +58,7 @@ const useMangaEntityOptions = () => {
           className={`p-2 cursor-pointer transition-all ${
             selectedMangaEntityUI === item.value ? "bg-black text-white" : ""
           }`}
-          onClick={() => setSelectedMangaEntityUI(item.value)}
+          onClick={() => changeMangaEntityUI(item.value)}
         >
           {item.icon}
         </div>

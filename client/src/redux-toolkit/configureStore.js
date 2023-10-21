@@ -11,6 +11,7 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import authSlice from "./authSlice";
+import mangaEntityUISlice from "./mangaEntityUISlice";
 
 const persistConfig = {
   key: "root",
@@ -20,6 +21,7 @@ const persistConfig = {
 
 const reducer = combineReducers({
   auth: authSlice,
+  mangaUI: mangaEntityUISlice,
 });
 const persistedReducer = persistReducer(persistConfig, reducer);
 
