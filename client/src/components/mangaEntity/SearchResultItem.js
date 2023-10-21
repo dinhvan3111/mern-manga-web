@@ -21,8 +21,8 @@ const SearchResultItem = ({ manga }) => {
           className="flex flex-col gap-2 cursor-pointer"
           onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
         >
-          <div className="flex justify-between">
-            <h4 className="text-lg break-words font-bold line-clamp-1 text-ellipsis">
+          <div className="sm:flex justify-between">
+            <h4 className="text-lg break-words font-bold line-clamp-1 h-fit">
               {manga.name}
             </h4>
             <div className="flex items-center gap-4">
@@ -44,7 +44,7 @@ const SearchResultItem = ({ manga }) => {
               ></BasicTag>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {manga?.genres.map((genre, index) => (
               <BasicTag
                 key={index}

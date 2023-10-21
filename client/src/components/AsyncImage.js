@@ -9,6 +9,7 @@ const AsyncImage = ({
   skeletonHeight = 110,
   size,
   alt,
+  imgClassName,
   borderRadius = "4px",
   ...props
 }) => {
@@ -33,6 +34,7 @@ const AsyncImage = ({
         onLoad={(e) => {
           setLoading(false);
         }}
+        className={imgClassName}
         alt="img"
       ></img>
       {loading && (

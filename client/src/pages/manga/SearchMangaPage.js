@@ -2,7 +2,7 @@ import { CircularProgress, IconButton } from "@mui/material";
 import { BiArrowBack, BiStar } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import BasicSearch from "../../components/search/BasicSearch";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import mangaApi from "../../api/mangaApi";
 import BasicPagination from "../../components/pagination/Pagination";
 import SearchResultItem from "../../components/mangaEntity/SearchResultItem";
@@ -13,6 +13,7 @@ const ITEMS_PER_PAGE = 10;
 const SearchMangaPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const key = searchParams.get("key");
+  const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState(key ?? "");
   const [isLoadingSearchRes, setIsLoadingSearchRes] = useState(false);
   const {
@@ -67,7 +68,7 @@ const SearchMangaPage = () => {
     <div className="page-wrapper">
       <div className="flex justify-between">
         <div className="flex items-center gap-8">
-          <IconButton>
+          <IconButton onClick={() => navigate(-1)}>
             <BiArrowBack></BiArrowBack>
           </IconButton>
           <h1 className="font-semibold text-3xl">Search </h1>

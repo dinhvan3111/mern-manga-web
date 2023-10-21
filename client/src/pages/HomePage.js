@@ -66,12 +66,24 @@ const HomePage = () => {
       return [];
     }
   });
-  // const recentMangaContainer = useMemo(
-  //   () => renderRecentManga(mangaList),
-  //   [mangaList]
-  // );
   useEffect(() => {
     window.scrollTo(0, 0);
+    function handleResize() {
+      var browserWidth =
+        window.innerWidth ||
+        document.documentElement.clientWidth ||
+        document.body.clientWidth;
+      const secondCol = document.getElementById("recent-update-1");
+      const lastCol = document.getElementById("recent-update-2");
+      if (browserWidth < 1024) {
+        lastCol.classList.add("hidden");
+      } else {
+        lastCol.classList.remove("hidden");
+      }
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
   useEffect(() => {
     if (mangaList) {
@@ -96,7 +108,7 @@ const HomePage = () => {
       </div>
       <div className="text-2xl pb-16">
         <h2>Latest Updates</h2>
-        <div className="mt-4 grid gap-x-6 3xl:grid-cols-4 2xl:grid-cols-3 lg:grid-cols-2 grid-cols-1">
+        <div className="mt-4 grid gap-x-6 lg:grid-cols-3 md:grid-cols-2 grid-cols-1">
           {isLoading
             ? Array(MAX_COL)
                 .fill(0)
@@ -114,6 +126,7 @@ const HomePage = () => {
                 ))
             : recentUpdateMangas.map((item, index) => (
                 <div
+                  id={`recent-update-${index}`}
                   key={index}
                   className="bg-gray-100 rounded-sm flex flex-col gap-4 p-4 "
                 >

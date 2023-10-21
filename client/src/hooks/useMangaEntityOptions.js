@@ -40,7 +40,7 @@ const useMangaEntityOptions = () => {
         );
       case MANGA_ENTITY_UI.THUMBNAIL_COVER:
         return (
-          <div className="grid grid-cols-6 gap-2">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6  gap-2">
             {listManga?.map((manga, index) => (
               <MangaThumbnailCoverItem key={index} manga={manga} />
             ))}
