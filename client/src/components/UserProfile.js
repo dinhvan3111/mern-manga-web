@@ -5,13 +5,14 @@ import { PAGE_PATH } from "../routes/page-path";
 import { logout } from "../redux-toolkit/authSlice";
 import { BiUser } from "react-icons/bi";
 import BasicTag from "./tag/BasicTag";
-import { Divider } from "@mui/material";
+import { Avatar, Divider } from "@mui/material";
 import BasicButton, { BUTTON_TYPE } from "./button/BasicButton";
 import { IoWaterOutline } from "react-icons/io5";
 import { AiOutlineSetting } from "react-icons/ai";
 import useClickOutside from "../hooks/useClickOutSide";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { userRoleToString } from "../util/textHelper";
 
 const UserProfile = () => {
   const { user } = useSelector((state) => state.auth);
@@ -21,8 +22,15 @@ const UserProfile = () => {
   const [coords, setCoords] = useState();
   const ref = useRef(null);
   const showModal = () => {
-    console.log(ref.current.getBoundingClientRect());
     setCoords(ref.current.getBoundingClientRect());
+    setShow(!show);
+  };
+  const onClickUserInfo = () => {
+    if (user?.data) {
+      navigate(PAGE_PATH.PROFILE);
+    } else {
+      navigate(PAGE_PATH.LOGIN);
+    }
     setShow(!show);
   };
   const preferences = [
@@ -66,26 +74,20 @@ const UserProfile = () => {
       },
     },
   ];
-  const userTagText = (role) => {
-    console.log(role === ROLE.USER);
-    switch (role) {
-      case ROLE.ADMIN:
-        return "Admin";
-      case ROLE.USER:
-        return "User";
-      default:
-        console.log("default");
-        return "";
-    }
-  };
   return (
     <div ref={hoverRef} className="relative">
-      <div
-        ref={ref}
-        className="p-2 bg-gray-100 rounded-full hover:cursor-pointer"
-        onClick={() => showModal()}
-      >
-        <BiUser size={30} />
+      <div ref={ref} className="cursor-pointer" onClick={() => showModal()}>
+        {user?.data ? (
+          <Avatar
+            alt="avt"
+            sx={{ width: 45, height: 45 }}
+            src="/images/default_avt.png"
+          />
+        ) : (
+          <div className="p-2 bg-gray-100 rounded-full">
+            <BiUser size={30} />
+          </div>
+        )}
       </div>
       {show && (
         <div
@@ -96,12 +98,20 @@ const UserProfile = () => {
           }}
         >
           <div className="px-4 py-2 rounded-md ">
-            <div className="flex flex-col px-4 py-4 mb-2 gap-2 justify-center items-center basic-hover no-select">
+            <div
+              className="flex flex-col px-4 py-4 mb-2 gap-2 justify-center items-center basic-hover no-select"
+              onClick={onClickUserInfo}
+            >
               {user?.data ? (
                 <>
-                  <BiUser size={50} />
+                  <Avatar
+                    alt="avt"
+                    sx={{ width: 70, height: 70 }}
+                    src="/images/default_avt.png"
+                  />
+                  {/* <BiUser size={50} /> */}
                   <h3 className="font-bold text-2xl">{user.data.username}</h3>
-                  <BasicTag label={userTagText(user?.role)} />
+                  <BasicTag label={userRoleToString(user?.role)} />
                 </>
               ) : (
                 <>

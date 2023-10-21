@@ -22,7 +22,7 @@ const SearchResultItem = ({ manga }) => {
           onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
         >
           <div className="flex justify-between">
-            <h4 className="text-lg break-all font-bold line-clamp-1 text-ellipsis">
+            <h4 className="text-lg break-words font-bold line-clamp-1 text-ellipsis">
               {manga.name}
             </h4>
             <div className="flex items-center gap-4">
@@ -53,7 +53,7 @@ const SearchResultItem = ({ manga }) => {
               ></BasicTag>
             ))}
           </div>
-          <p className="text-base break-all line-clamp-2 text-ellipsis">
+          <p className="text-base break-words line-clamp-2 text-ellipsis">
             {manga.description}
           </p>
         </div>

@@ -1,0 +1,34 @@
+import React from "react";
+import { PAGE_PATH } from "../../routes/page-path";
+
+const MangaThumbnailCoverItem = ({ manga }) => {
+  return (
+    <div>
+      <div className="h-80">
+        {/* <a className="" href={PAGE_PATH.MANGA_DETAIL(manga._id)}>
+          <img
+            className="rounded-md h-full w-full object-cover"
+            src={manga.thumbUrl}
+            alt="thumbnail"
+          />
+        </a> */}
+        <a href={PAGE_PATH.MANGA_DETAIL(manga._id)}>
+          <div className="group relative h-80 max-w-full rounded-md overflow-hidden">
+            <img
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-100 group-hover:scale-105"
+              src={manga.thumbUrl}
+              alt="thumbnail"
+            />
+            <div className="mix-blend-normal absolute inset-0 transition-all duration-500 bg-gradient-to-t from-black/30 group-hover:from-black/80 to-transparent h-full w-full">
+              <div className="mix-blend-normal absolute transition-all duration-100 bottom-0 group-hover:bottom-2 flex items-end p-2 ">
+                <span className="text-white select-none">{manga.name}</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default MangaThumbnailCoverItem;

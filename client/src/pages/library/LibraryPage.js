@@ -4,9 +4,17 @@ import { IoArrowBack } from "react-icons/io5";
 import mangaApi from "../../api/mangaApi";
 import SearchResultItem from "../../components/mangaEntity/SearchResultItem";
 import BasicPagination from "../../components/pagination/Pagination";
+import useMangaEntityOptions from "../../hooks/useMangaEntityOptions";
 
 const LibraryPage = () => {
-  const [listManga, setListManga] = useState([]);
+  const {
+    listManga,
+    setListManga,
+    selectedMangaEntityUI,
+    setSelectedMangaEntityUI,
+    renderMangaEntityUI,
+    renderMenuOptions,
+  } = useMangaEntityOptions();
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState();
@@ -14,9 +22,8 @@ const LibraryPage = () => {
   const fetchListMangaInLib = async (page, limit) => {
     setIsLoading(true);
     const res = await mangaApi.getListMangaInLib(page, limit);
-    console.log(res);
     if (res.success) {
-      setListManga(res.data.docs);
+      setListManga(res.data.docs.map((favourite) => favourite.manga));
       setCurrentPage(res.data.page);
       setTotalPage(res.data.totalPages);
       setTotalItems(res.data.totalDocs);
@@ -44,11 +51,14 @@ const LibraryPage = () => {
         </div>
       ) : (
         <div className="mt-4 pb-20">
-          <span className="text-lg">
-            {totalItems > 0
-              ? `${totalItems} ${totalItems > 1 ? "titles" : "title"}`
-              : "No titles"}
-          </span>
+          <div className="flex justify-between">
+            <span className="text-lg">
+              {totalItems > 0
+                ? `${totalItems} ${totalItems > 1 ? "titles" : "title"}`
+                : "No titles"}
+            </span>
+            {renderMenuOptions()}
+          </div>
           <div className="mt-4 w-full">
             {listManga?.length > 0 ? (
               <BasicPagination
@@ -56,11 +66,7 @@ const LibraryPage = () => {
                 pageCount={totalPage}
                 currentPage={currentPage}
               >
-                <div className="flex flex-col gap-4">
-                  {listManga?.map((favourite, index) => (
-                    <SearchResultItem key={index} manga={favourite.manga} />
-                  ))}
-                </div>
+                {renderMangaEntityUI(selectedMangaEntityUI)}
               </BasicPagination>
             ) : (
               <div className="bg-gray-100 py-8 text-lg w-full flex justify-center items-center rounded-md">

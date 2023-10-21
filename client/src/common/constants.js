@@ -53,6 +53,11 @@ export const MANGA_STATUS = {
   COMPLETED: 1,
   ABANDONED: 2,
 };
+export const PROFILE_ACTION = {
+  FOLLOW: 1,
+  MESSAGE: 2,
+  REPORT: 3,
+};
 
 export const reactQueryKey = {
   POPULAR_MANGA: ["popularManga"],
@@ -62,4 +67,9 @@ export const reactQueryKey = {
 export const SORT_CHAPTER = {
   ASC: 1,
   DESC: -1,
+};
+
+export const MANGA_ENTITY_UI = {
+  LIST: 1,
+  THUMBNAIL_COVER: 2,
 };

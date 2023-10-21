@@ -2,7 +2,7 @@ import { Skeleton } from "@mui/material";
 import React, { useState } from "react";
 
 const AsyncImage = ({
-  src,
+  src = "/images/no_image/no_manga_thumb.png",
   width,
   height,
   skeletonWidth = "100%",

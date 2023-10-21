@@ -2,16 +2,11 @@ import { CircularProgress, IconButton } from "@mui/material";
 import { BiArrowBack, BiStar } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import BasicSearch from "../../components/search/BasicSearch";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import mangaApi from "../../api/mangaApi";
-import { PAGE_PATH } from "../../routes/page-path";
-import { RiGroupLine } from "react-icons/ri";
-import { dateToTs, getDateDiff } from "../../util/timeHelper";
-import { HiOutlineEye } from "react-icons/hi";
-import BasicTag from "../../components/tag/BasicTag";
-import { mangaStatusToString } from "../../util/stringHelper";
 import BasicPagination from "../../components/pagination/Pagination";
 import SearchResultItem from "../../components/mangaEntity/SearchResultItem";
+import useMangaEntityOptions from "../../hooks/useMangaEntityOptions";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -20,7 +15,15 @@ const SearchMangaPage = () => {
   const key = searchParams.get("key");
   const [searchKeyword, setSearchKeyword] = useState(key ?? "");
   const [isLoadingSearchRes, setIsLoadingSearchRes] = useState(false);
-  const [searchResult, setSearchResult] = useState([]);
+  const {
+    listManga: searchResult,
+    setListManga: setSearchResult,
+    selectedMangaEntityUI,
+    setSelectedMangaEntityUI,
+    renderMangaEntityUI,
+    renderMenuOptions,
+  } = useMangaEntityOptions();
+  // const [searchResult, setSearchResult] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState();
   const onSearchCourse = async (value, page = 1) => {
@@ -28,7 +31,6 @@ const SearchMangaPage = () => {
     setSearchKeyword(value);
     const res = await mangaApi.searchMangaByKey(value, page, ITEMS_PER_PAGE);
     if (res.success) {
-      console.log(res);
       setSearchResult(res.data.docs);
       setCurrentPage(res.data.page);
       setTotalPage(res.data.totalPages);
@@ -63,11 +65,14 @@ const SearchMangaPage = () => {
   }, []);
   return (
     <div className="page-wrapper">
-      <div className="flex items-center gap-8">
-        <IconButton>
-          <BiArrowBack></BiArrowBack>
-        </IconButton>
-        <h1 className="font-semibold text-3xl">Search </h1>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-8">
+          <IconButton>
+            <BiArrowBack></BiArrowBack>
+          </IconButton>
+          <h1 className="font-semibold text-3xl">Search </h1>
+        </div>
+        {renderMenuOptions()}
       </div>
       <div className="mt-8">
         <BasicSearch
@@ -98,9 +103,7 @@ const SearchMangaPage = () => {
             pageCount={totalPage}
             currentPage={currentPage}
           >
-            {searchResult.map((manga, index) => (
-              <SearchResultItem key={index} manga={manga} />
-            ))}
+            {renderMangaEntityUI(selectedMangaEntityUI)}
           </BasicPagination>
         )}
       </div>

@@ -8,7 +8,13 @@ import { PAGE_PATH } from "../../routes/page-path";
 const AuthPage = ({ authRoute }) => {
   const navigate = useNavigate();
   return (
-    <div className="container auth-bg flex justify-center items-center">
+    <div
+      style={{
+        // height: "100vh",
+        backgroundImage: `url(${"/images/auth_page_background.png"})`,
+      }}
+      className="container auth-bg flex justify-center items-center"
+    >
       <div className="w-[500px]">
         <div
           className="text-center text-white text-3xl font-semibold cursor-pointer no-select"
