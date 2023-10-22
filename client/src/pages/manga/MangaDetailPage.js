@@ -11,7 +11,11 @@ import {
 import mangaApi from "../../api/mangaApi";
 import { CircularProgress, Skeleton, Typography } from "@mui/material";
 import { mangaStatusToString } from "../../util/stringHelper";
-import { MANGA_STATUS, SORT_CHAPTER } from "../../common/constants";
+import {
+  DETAIL_MANGA_TAG,
+  MANGA_STATUS,
+  SORT_CHAPTER,
+} from "../../common/constants";
 import chapterApi from "../../api/chapterApi";
 import { dateToTs, getDateDiff } from "../../util/timeHelper";
 import { PAGE_PATH } from "../../routes/page-path";
@@ -78,22 +82,32 @@ const MangaDetailPage = () => {
 const MangaDetailContentSkeleton = () => {
   return (
     <div className={`bg-gradient-to-r from-gray-800 to-gray-300`}>
-      <div className="backdrop-blur-lg h-full bg-black/20 pt-52">
+      <div className="backdrop-blur-lg h-full bg-gradient-to-t from-white from-70% to-white/60 to-100% md:bg-gradient-to-r sm:from-black/70 sm:from-10% sm:to-white/20 sm:to-100% pt-52">
         <div className="mt-20">
           <div className="relative backdrop-blur-lg h-full bg-white/[100%]">
             <div className="page-wrapper">
               <div className="absolute -top-52 flex gap-4">
-                <div className="w-52 bg-white">
-                  <Skeleton
-                    variant="rectangular"
-                    width={208}
-                    height={300}
-                    animation="wave"
-                  ></Skeleton>
+                <div className="w-32 sm:w-52 h-fit bg-white">
+                  <div className="block sm:hidden">
+                    <Skeleton
+                      variant="rectangular"
+                      width={128}
+                      height={200}
+                      animation="wave"
+                    ></Skeleton>
+                  </div>
+                  <div className="hidden sm:block">
+                    <Skeleton
+                      variant="rectangular"
+                      width={208}
+                      height={300}
+                      animation="wave"
+                    ></Skeleton>
+                  </div>
                 </div>
                 <div className="flex flex-col justify-between">
                   <div className="">
-                    <div className="h-[154px]">
+                    <div className="h-fit lg:h-[154px]">
                       <Typography variant="h2">
                         <Skeleton variant="text" className="w-full bg-white" />
                       </Typography>
@@ -109,12 +123,15 @@ const MangaDetailContentSkeleton = () => {
                   </div>
                   <div className="pt-10">
                     <div className="flex h-14 gap-4 w-fit">
-                      <BasicButton loading={true} className="!w-60 !text-lg">
+                      <BasicButton
+                        loading={true}
+                        className="!w-fit lg:!w-60 !text-md lg:!text-lg"
+                      >
                         Add To Library
                       </BasicButton>
                       <BasicButton
                         loading={true}
-                        className="!w-60 !text-lg !bg-gray-100"
+                        className="!w-fit lg:!w-60 !text-md lg:!text-lg !bg-gray-100"
                         buttonType={BUTTON_TYPE.NO_COLOR}
                       >
                         Start Reading
@@ -158,6 +175,24 @@ const sortChapterOptions = [
     value: SORT_CHAPTER.DESC,
     label: "Descending",
     icon: <HiOutlineSortDescending />,
+  },
+];
+
+const detailMangaTag = (manga) => [
+  {
+    value: DETAIL_MANGA_TAG.AUTHORS,
+    label: "Authors",
+    data: manga?.authors,
+  },
+  {
+    value: DETAIL_MANGA_TAG.ARTISTS,
+    label: "Artists",
+    data: manga?.artists,
+  },
+  {
+    value: DETAIL_MANGA_TAG.GENRES,
+    label: "Genres",
+    data: manga?.genres,
   },
 ];
 
@@ -220,14 +255,15 @@ const MangaDetailContent = ({
       }}
       className={`bg-[image:var(--image-url)] bg-fixed bg-no-repeat bg-cover bg-center  `}
     >
-      <div className="backdrop-blur-lg h-full bg-gradient-to-r from-black/70 to-white/20 pt-52">
+      <div className="backdrop-blur-lg h-full bg-gradient-to-t from-white from-70% to-white/60 to-100% md:bg-gradient-to-r sm:from-black/70 sm:from-10% sm:to-white/20 sm:to-100% pt-52">
         <div className="mt-20">
           <div className="relative backdrop-blur-lg h-full bg-white/[100%]">
             <div className="page-wrapper">
-              <div className="absolute -top-52 w-full flex">
+              <div className="absolute -top-52 w-fit flex gap-4">
                 <div className="basis-1/6">
-                  <div className="bg-white rounded-md w-52 drop-shadow-xl">
+                  <div className="bg-white rounded-md w-32 sm:w-52 h-fit drop-shadow-xl">
                     <AsyncImage
+                      imgClassName="object-fit"
                       src={manga.thumbUrl}
                       skeletonHeight={300}
                       alt="img"
@@ -238,46 +274,17 @@ const MangaDetailContent = ({
                   <div className="flex flex-col w-full justify-between">
                     <div className="">
                       <h3
-                        className="h-[154px] font-bold text-white text-7xl cursor-pointer line-clamp-2 drop-shadow-lg"
+                        className="h-fit lg:h-[154px] font-bold text-black sm:text-white text-2xl md:text-4xl lg:text-7xl  cursor-pointer line-clamp-2 drop-shadow-lg"
                         //   onClick={() => navigate(`${PAGE_PATH.MANGA_DETAIL(1)}`)}
                       >
                         {manga?.name}
                       </h3>
-                      <h4 className="mt-4 text-white text-lg font-semibold">
+                      <h4 className="mt-4 text-black sm:text-white text-md sm:text-lg font-semibold">
                         {manga?.authors.join(", ")}
                       </h4>
                     </div>
-                    <div className="pt-10">
-                      <div className="flex h-14 gap-4 w-fit">
-                        {manga.isInFavourite ? (
-                          <BasicButton
-                            loading={addLibLoading}
-                            className="!w-60 !text-lg"
-                            icon={<RiCheckLine size={40} />}
-                            onClick={removeFromLib}
-                          >
-                            In library
-                          </BasicButton>
-                        ) : (
-                          <BasicButton
-                            loading={addLibLoading}
-                            className="!w-60 !text-lg"
-                            onClick={addToLib}
-                          >
-                            Add To Library
-                          </BasicButton>
-                        )}
-                        <BasicButton
-                          disabled={chapters?.length === 0}
-                          onClick={handleStartReading}
-                          className="!w-60 !text-lg !bg-gray-100"
-                          buttonType={BUTTON_TYPE.NO_COLOR}
-                          icon={<BiBookOpen size={30} />}
-                        >
-                          Start Reading
-                        </BasicButton>
-                      </div>
-                      <div className="mt-2 flex gap-1">
+                    <div className="block lg:hidden">
+                      <div className="mt-2 flex flex-wrap gap-1">
                         {manga?.genres.map((genre) => (
                           <BasicTag
                             key={genre._id}
@@ -292,7 +299,66 @@ const MangaDetailContent = ({
                           label={mangaStatusToString(manga?.status)}
                         ></BasicTag>
                       </div>
-                      <div className="mt-2">
+                    </div>
+                    <div className="mt-2 block lg:hidden">
+                      <div className="flex gap-2 items-center">
+                        <BiStar size={20} color="orange" />
+                        <span className="text-lg text-orange-500">
+                          {parseFloat(manga?.rating).toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="pt-10">
+                      <div className="flex h-14 gap-4 w-fit">
+                        {manga.isInFavourite ? (
+                          <BasicButton
+                            loading={addLibLoading}
+                            className="!w-fit lg:!w-60 !text-md lg:!text-lg"
+                            icon={<RiCheckLine size={40} />}
+                            onClick={removeFromLib}
+                          >
+                            In library
+                          </BasicButton>
+                        ) : (
+                          <BasicButton
+                            loading={addLibLoading}
+                            className="!w-fit lg:!w-60 !text-md lg:!text-lg"
+                            onClick={addToLib}
+                          >
+                            Add To Library
+                          </BasicButton>
+                        )}
+                        <BasicButton
+                          disabled={chapters?.length === 0}
+                          onClick={handleStartReading}
+                          className="!w-fit lg:!w-60 !text-md lg:!text-lg !bg-gray-100"
+                          buttonType={BUTTON_TYPE.NO_COLOR}
+                          icon={<BiBookOpen size={30} />}
+                        >
+                          Start Reading
+                        </BasicButton>
+                      </div>
+                      {/* ===================Responsive genres and rating (Max width lg)======================== */}
+                      <div className="hidden lg:block">
+                        <div className="mt-2 flex gap-1">
+                          {manga?.genres.map((genre) => (
+                            <BasicTag
+                              key={genre._id}
+                              className="!font-bold text-gray-700 p-1"
+                              label={genre.name}
+                            ></BasicTag>
+                          ))}
+                          <BasicTag
+                            showStatusDot={true}
+                            statusDotColor={renderMangaStatusColor(
+                              manga?.status
+                            )}
+                            className="!font-bold text-gray-700 p-1"
+                            label={mangaStatusToString(manga?.status)}
+                          ></BasicTag>
+                        </div>
+                      </div>
+                      <div className="mt-2 hidden lg:block">
                         <div className="flex gap-2 items-center">
                           <BiStar size={20} color="orange" />
                           <span className="text-lg text-orange-500">
@@ -300,59 +366,42 @@ const MangaDetailContent = ({
                           </span>
                         </div>
                       </div>
+                      {/* ===================Responsive genres and rating (Max width lg)======================== */}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="mt-20">
-                <p className="leading-7 w-full">{manga?.description}</p>
+                <p className="leading-7 w-fit">{manga?.description}</p>
                 <div className="mt-8">
-                  <div className="flex gap-5">
+                  <div className="block md:flex gap-5">
                     <div className="flex-1 flex gap-8 h-fit flex-wrap">
-                      <div>
-                        <h4 className="font-bold text-lg">Author</h4>
-                        <div className="flex gap-2">
-                          {manga?.authors.length > 0
-                            ? manga?.authors.map((item, index) => (
-                                <BasicTag
-                                  key={index}
-                                  className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
-                                  label={item}
-                                ></BasicTag>
-                              ))
-                            : "Unknown"}
+                      {detailMangaTag(manga).map((detailTag) => (
+                        <div key={detailTag.value}>
+                          <h4 className="font-bold text-lg">Author</h4>
+                          <div className="flex gap-2">
+                            {detailTag.data?.length > 0
+                              ? detailTag.data.map((item, index) => {
+                                  console.log(item);
+                                  return (
+                                    <BasicTag
+                                      key={index}
+                                      className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
+                                      label={
+                                        detailTag.value ===
+                                        DETAIL_MANGA_TAG.GENRES
+                                          ? item.name
+                                          : item
+                                      }
+                                    ></BasicTag>
+                                  );
+                                })
+                              : "Unknown"}
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-lg">Artist</h4>
-                        <div className="flex gap-2">
-                          {manga?.artists.length > 0
-                            ? manga?.artists.map((item, index) => (
-                                <BasicTag
-                                  key={index}
-                                  className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
-                                  label={item}
-                                ></BasicTag>
-                              ))
-                            : "Unknown"}
-                        </div>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-lg">Genres</h4>
-                        <div className="flex gap-2">
-                          {manga?.genres.length > 0
-                            ? manga?.genres.map((item) => (
-                                <BasicTag
-                                  key={item._id}
-                                  className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
-                                  label={item.name}
-                                ></BasicTag>
-                              ))
-                            : "Unknown"}
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                    <div className="flex-2 flex-grow">
+                    <div className="flex-2 mt-10 md:mt-0 flex-grow">
                       <div className="flex justify-between items-center">
                         <div>
                           <span className="font-bold">Chapters</span>

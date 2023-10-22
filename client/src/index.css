@@ -26,6 +26,21 @@ code {
   /* padding-bottom: 64px; */
 }
 
+.appbar-wrapper {
+  padding: 16px 64px;
+}
+
+@media (max-width: 639px) {
+  .page-wrapper {
+    height: 100vh;
+    padding: 86px 32px;
+    /* padding-bottom: 64px; */
+  }
+  .appbar-wrapper {
+    padding: 16px 32px;
+  }
+}
+
 .no-select {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-user-select: none; /* Safari */

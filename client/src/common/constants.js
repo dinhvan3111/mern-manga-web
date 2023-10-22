@@ -64,6 +64,12 @@ export const reactQueryKey = {
   ALL_MANGA: ["mangaAll"],
 };
 
+export const DETAIL_MANGA_TAG = {
+  AUTHORS: 1,
+  ARTISTS: 2,
+  GENRES: 3,
+};
+
 export const SORT_CHAPTER = {
   ASC: 1,
   DESC: -1,

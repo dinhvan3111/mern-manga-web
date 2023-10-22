@@ -99,14 +99,14 @@ const BasicAppBar = ({
         !top && `bg-white border-b-2 border-orange-500 shadow-md`
       }`}
     >
-      <div className="px-16 py-4 flex justify-between items-center">
+      <div className="appbar-wrapper flex justify-between items-center">
         <div className={`${leftDrawerOpen ? "invisible" : ""} flex gap-4`}>
           <IconButton onClick={() => onOpenLeftDrawer()}>
             <BiMenuAltLeft color={!top ? "" : accordionIconColor} />
           </IconButton>
           <div
             className={`text-2xl font-bold hover:cursor-pointer no-select ${
-              !top ? "" : `${textColor}`
+              !top ? "" : `text-black sm:${textColor}`
             } `}
             onClick={() => navigate(PAGE_PATH.HOME)}
           >
