@@ -22,6 +22,11 @@ export const USER_MENU = {
   },
 };
 
+export const DRAWER_TYPE = {
+  RESPONSIVE: 1,
+  TEMPORARY: 2,
+};
+
 export const ACCORDION_NAV_OPTION = {
   HOME: 0,
   FOLLOWING: {

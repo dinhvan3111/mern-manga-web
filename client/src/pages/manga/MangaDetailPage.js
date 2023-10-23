@@ -381,21 +381,18 @@ const MangaDetailContent = ({
                           <h4 className="font-bold text-lg">Author</h4>
                           <div className="flex gap-2">
                             {detailTag.data?.length > 0
-                              ? detailTag.data.map((item, index) => {
-                                  console.log(item);
-                                  return (
-                                    <BasicTag
-                                      key={index}
-                                      className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
-                                      label={
-                                        detailTag.value ===
-                                        DETAIL_MANGA_TAG.GENRES
-                                          ? item.name
-                                          : item
-                                      }
-                                    ></BasicTag>
-                                  );
-                                })
+                              ? detailTag.data.map((item, index) => (
+                                  <BasicTag
+                                    key={index}
+                                    className="mt-2 w-fit py-1 text-center !bg-gray-100 font-normal text-sm text-gray-700"
+                                    label={
+                                      detailTag.value ===
+                                      DETAIL_MANGA_TAG.GENRES
+                                        ? item.name
+                                        : item
+                                    }
+                                  ></BasicTag>
+                                ))
                               : "Unknown"}
                           </div>
                         </div>

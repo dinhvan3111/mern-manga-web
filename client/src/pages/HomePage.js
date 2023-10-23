@@ -75,9 +75,9 @@ const HomePage = () => {
       const secondCol = document.getElementById("recent-update-1");
       const lastCol = document.getElementById("recent-update-2");
       if (browserWidth < 1024) {
-        lastCol.classList.add("hidden");
+        lastCol?.classList.add("hidden");
       } else {
-        lastCol.classList.remove("hidden");
+        lastCol?.classList.remove("hidden");
       }
     }
 

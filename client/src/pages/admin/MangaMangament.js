@@ -144,7 +144,7 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
                 label={mangaStatusToString(manga?.status)}
               ></BasicTag>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {manga?.genres.map((genre, index) => (
                 <BasicTag
                   key={index}
