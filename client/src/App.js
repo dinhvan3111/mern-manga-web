@@ -77,6 +77,15 @@ function App() {
               element={<AddMangaPage />}
             ></Route>
           </Route>
+          <Route
+            path={PAGE_PATH.EDIT_MANGA()}
+            element={<ProtectedRoute pageRole={[ROLE.ADMIN]} />}
+          >
+            <Route
+              path={PAGE_PATH.EDIT_MANGA()}
+              element={<AddMangaPage />}
+            ></Route>
+          </Route>
         </Route>
         {/*----------Transparent background layout-------------- */}
         <Route

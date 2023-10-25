@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { BiArrowBack } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import BasicTextField from "../../components/input/BasicTextField";
 import genreApi from "../../api/genreApi";
 import { AiOutlineUpload } from "react-icons/ai";
@@ -21,25 +21,33 @@ import { addMangaSchema } from "../../common/form-schema";
 import PopupMsg from "../../components/popup/PopupMessage";
 import usePopup from "../../hooks/usePopup";
 import { SUBMIT_STATUS } from "../../common/constants";
+import { PAGE_PATH } from "../../routes/page-path";
 
 const AddMangaPage = () => {
+  const addMatch = useMatch(PAGE_PATH.ADD_MANGA);
+  const editMatch = useMatch(PAGE_PATH.EDIT_MANGA());
+  const mangaId = editMatch?.params.id;
+  const isAddPage = Boolean(addMatch);
   const navigate = useNavigate();
   const fileRef = React.useRef(null);
   const {
     handleSubmit,
     control,
-    register,
     setValue,
-    getValues,
     watch,
     reset,
     formState: { isSubmitting, errors, isDirty, isSubmitSuccessful },
   } = useForm({ resolver: yupResolver(addMangaSchema) });
+  const [manga, setManga] = useState();
   const watchFile = watch("thumbnail");
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = React.useState([]);
   const [addMangaMsg, setAddMangaMsg] = useState("");
   const [addMangaStatus, setAddMangaStatus] = useState();
+  const [isFetchingGenres, setIsFetchingGenres] = useState(
+    isAddPage ? true : false
+  );
+  const [isLoading, setIsLoading] = useState(isAddPage ? false : true);
   const {
     open: addStatusModel,
     handleOpenPopup: handleOpenAddStatusModal,
@@ -52,7 +60,25 @@ const AddMangaPage = () => {
     } = event;
     setSelectedGenres(typeof value === "string" ? value.split(",") : value);
   };
-  const [isFetchingGenres, setIsFetchingGenres] = useState(false);
+  const setFormValue = (manga) => {
+    let defaultValues = {};
+    defaultValues.name = manga?.name;
+    defaultValues.description = manga?.description;
+    defaultValues.authors = manga.authors.join(",");
+    defaultValues.artists = manga.artists.join(",");
+    defaultValues.transTeam = manga.transTeam;
+    reset({ ...defaultValues });
+    // if (manga) {
+    //   setValue("name", manga.name);
+    //   setValue("description", manga.description);
+    //   // setValue("thumbnail", manga.thumbUrl);
+    //   setValue("authors", manga.authors.join(","));
+    //   setValue("artists", manga.artists.join(","));
+    //   setValue("transTeam", manga.transTeam);
+    setSelectedGenres(manga.genres);
+    setManga(manga);
+    // }
+  };
   const fetchGenres = async () => {
     setIsFetchingGenres(true);
     const res = await genreApi.getAllGenres();
@@ -63,8 +89,64 @@ const AddMangaPage = () => {
   };
   const resetFileds = () => {
     if (addMangaStatus === SUBMIT_STATUS.FAILED) return;
-    reset();
-    setSelectedGenres([]);
+    if (isAddPage) {
+      reset();
+      setSelectedGenres([]);
+    } else {
+      reset({}, { keepValues: true });
+    }
+  };
+  const fetchMangaDetail = async (id) => {
+    setIsLoading(true);
+    const res = await mangaApi.getMangaById(id);
+    if (res.success === true) {
+      setFormValue(res.data.manga);
+    }
+    setIsLoading(false);
+  };
+  const addManga = async (formData, submitData) => {
+    try {
+      const createRes = await mangaApi.addManga(submitData);
+      if (createRes.success) {
+        // If thumbnail not empty
+        if (!formData.entries().next().done) {
+          const uploadThumbRes = await mangaApi.uploadMangaThumb(
+            createRes.manga._id,
+            formData
+          );
+        }
+        setAddMangaMsg("Add manga success");
+        setAddMangaStatus(SUBMIT_STATUS.SUCCESS);
+      } else {
+        setAddMangaMsg("Add manga failed");
+        setAddMangaStatus(SUBMIT_STATUS.FAILED);
+      }
+    } catch (error) {
+      setAddMangaMsg("Failed");
+      setAddMangaStatus(SUBMIT_STATUS.FAILED);
+    }
+  };
+  const updateManga = async (mangaId, formData, submitData) => {
+    try {
+      const createRes = await mangaApi.updateManga(mangaId, submitData);
+      if (createRes.success) {
+        // If thumbnail not empty
+        if (!formData.entries().next().done) {
+          const uploadThumbRes = await mangaApi.uploadMangaThumb(
+            createRes.manga._id,
+            formData
+          );
+        }
+        setAddMangaMsg("Update manga success");
+        setAddMangaStatus(SUBMIT_STATUS.SUCCESS);
+      } else {
+        setAddMangaMsg("Update manga failed");
+        setAddMangaStatus(SUBMIT_STATUS.FAILED);
+      }
+    } catch (error) {
+      setAddMangaMsg("Failed");
+      setAddMangaStatus(SUBMIT_STATUS.FAILED);
+    }
   };
   const onSubmit = async (data) => {
     handleOpenAddStatusModal();
@@ -77,42 +159,30 @@ const AddMangaPage = () => {
     Object.keys(files).forEach((key) =>
       formData.append(files.item(key).name, files.item(key))
     );
-    try {
-      const submitData = {
-        name: data.name,
-        description: data.description,
-        // thumbUrl: publicThumbUrl,
-        authors: authors,
-        artists: artists,
-        transTeam: data.transTeam,
-        genres: listSelectedGenreIds,
-      };
-      const createRes = await mangaApi.addManga(submitData);
-      if (createRes.success) {
-        const uploadThumbRes = await mangaApi.uploadMangaThumb(
-          createRes.manga._id,
-          formData
-        );
-        setAddMangaMsg("Success");
-        setAddMangaStatus(SUBMIT_STATUS.SUCCESS);
-
-        // const res
-      } else {
-        setAddMangaMsg("Failed");
-        setAddMangaStatus(SUBMIT_STATUS.FAILED);
-      }
-      // console.log(getValues("thumbnail"));
-    } catch (error) {
-      setAddMangaMsg("Failed");
-      setAddMangaStatus(SUBMIT_STATUS.FAILED);
+    const submitData = {
+      name: data.name,
+      description: data.description,
+      // thumbUrl: publicThumbUrl,
+      authors: authors,
+      artists: artists,
+      transTeam: data.transTeam,
+      genres: listSelectedGenreIds,
+    };
+    if (isAddPage) {
+      await addManga(formData, submitData);
+    } else {
+      await updateManga(mangaId, formData, submitData);
     }
   };
   useEffect(() => {
     resetFileds();
   }, [isSubmitSuccessful]);
   useEffect(() => {
+    if (!isAddPage) {
+      fetchMangaDetail(mangaId);
+    }
     fetchGenres();
-  }, []);
+  }, [mangaId, isAddPage]);
   return (
     <>
       <div className="page-wrapper">
@@ -120,9 +190,11 @@ const AddMangaPage = () => {
           <IconButton onClick={() => navigate(-1)}>
             <BiArrowBack></BiArrowBack>
           </IconButton>
-          <h1 className="font-bold text-4xl">Add Manga</h1>
+          <h1 className="font-bold text-4xl">
+            {isAddPage ? "Add Manga" : "Edit Manga"}
+          </h1>
         </div>
-        {isFetchingGenres ? (
+        {isLoading || isFetchingGenres ? (
           <div className="mb-10 flex justify-center items-center">
             <CircularProgress
               style={{
@@ -263,12 +335,20 @@ const AddMangaPage = () => {
                           }`}
                           control={control}
                         />
-                        {watchFile?.length > 0 ? (
-                          <img
-                            className="mt-4 w-52 object-contain"
-                            src={URL.createObjectURL(watchFile[0])}
-                            alt="thumbnail"
-                          ></img>
+                        {manga?.thumbUrl || watchFile ? (
+                          watchFile ? (
+                            <img
+                              className="mt-4 w-52 object-contain"
+                              src={URL.createObjectURL(watchFile[0])}
+                              alt="thumbnail"
+                            ></img>
+                          ) : (
+                            <img
+                              className="mt-4 w-52 object-contain"
+                              src={manga?.thumbUrl}
+                              alt="thumbnail"
+                            ></img>
+                          )
                         ) : (
                           <div className="mt-4 p-4 w-52 h-full rounded-lg border-dashed border-2 border-slate-300">
                             <img

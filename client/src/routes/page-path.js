@@ -14,6 +14,8 @@ const PAGE_PATH = {
 
   //==========MANGA==================
   ADD_MANGA: "/admin/manga/add",
+  EDIT_MANGA: (id) =>
+    id === undefined ? "/admin/manga/edit/:id" : `/admin/manga/edit/${id}`,
   MANGA_MANAGEMENT: "/admin/manga/management",
   MANGA_DETAIL: (id) => (id === undefined ? "/manga/:id" : `/manga/${id}`),
   SEARCH_MANGA: (key) =>

@@ -106,7 +106,6 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
     setDeleteStatus(SUBMIT_STATUS.FAILED);
     setPopupMsg("Delete manga successful");
   };
-  const onGoToEditPage = () => {};
   return (
     <>
       <div className="flex gap-4 w-full h-fit bg-gray-100 p-2 rounded-md">
@@ -158,7 +157,9 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
             </p>
           </div>
           <div className="flex flex-1 items-center justify-end">
-            <IconButton>
+            <IconButton
+              onClick={() => navigate(PAGE_PATH.EDIT_MANGA(manga._id))}
+            >
               <AiFillEdit color="green" />
             </IconButton>
             <IconButton onClick={handleOpenConfirmPopup}>
