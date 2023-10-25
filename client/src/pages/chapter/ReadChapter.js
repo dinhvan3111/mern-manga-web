@@ -65,7 +65,7 @@ const ReadChapter = () => {
       top: readingSection.offsetTop,
       behavior: "smooth",
     });
-  });
+  }, []);
   return (
     <div className="relative">
       {!isLoading && <NavigationPageBar chapter={chapter} currentPage={page} />}
