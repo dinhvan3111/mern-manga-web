@@ -42,8 +42,8 @@ const BasicAppBar = ({
     }
   };
   const onSearchItemClick = (item) => {
-    // if (!item) return;
-    // navigate(`/course-detail/${item?._id}`);
+    if (!item) return;
+    navigate(`/manga/${item?._id}`);
   };
   const handleOnClickSearchWithKeyItem = () => {
     searchRef.current.blur();
@@ -52,37 +52,35 @@ const BasicAppBar = ({
 
   const dropdownSearchItemBuilder = (item) => {
     return (
-      <a key={item?._id} href={`/manga/${item?._id}`}>
-        <div
-          className="px-4 py-2 flex gap-4 justify-start items-center cursor-pointer bg-gray-100 hover:bg-gray-200"
-          onClick={() => onSearchItemClick(item)}
-        >
-          <div className="shadow-lg w-16 h-full">
-            <AsyncImage src={item?.thumbUrl} alt="courseThumb" />
-          </div>
-          <div className="flex flex-col gap-2">
-            <span className="font-bold">{item.name}</span>
-            <div className="flex gap-4 items-center">
-              <div className="flex gap-1 items-center">
-                <BiStar size={17} color="orange" />
-                <span className=" text-sm text-orange-500">
-                  {parseFloat(item?.rating).toFixed(1)}
-                </span>
-              </div>
-              <div className="flex gap-1 items-center">
-                <HiOutlineEye size={17} />
-                <span className="text-sm">{item?.views}</span>
-              </div>
-            </div>
-            <BasicTag
-              className="w-fit"
-              showStatusDot={true}
-              mangaStatus={item?.status}
-              label={mangaStatusToString(item?.status)}
-            ></BasicTag>
-          </div>
+      <div
+        className="px-4 py-2 flex gap-4 justify-start items-center cursor-pointer bg-gray-100 hover:bg-gray-200"
+        onClick={() => onSearchItemClick(item)}
+      >
+        <div className="shadow-lg w-16 h-full">
+          <AsyncImage src={item?.thumbUrl} alt="courseThumb" />
         </div>
-      </a>
+        <div className="flex flex-col gap-2">
+          <span className="font-bold">{item.name}</span>
+          <div className="flex gap-4 items-center">
+            <div className="flex gap-1 items-center">
+              <BiStar size={17} color="orange" />
+              <span className=" text-sm text-orange-500">
+                {parseFloat(item?.rating).toFixed(1)}
+              </span>
+            </div>
+            <div className="flex gap-1 items-center">
+              <HiOutlineEye size={17} />
+              <span className="text-sm">{item?.views}</span>
+            </div>
+          </div>
+          <BasicTag
+            className="w-fit"
+            showStatusDot={true}
+            mangaStatus={item?.status}
+            label={mangaStatusToString(item?.status)}
+          ></BasicTag>
+        </div>
+      </div>
     );
   };
 
