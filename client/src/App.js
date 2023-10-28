@@ -26,7 +26,7 @@ function App() {
   const navigate = useNavigate();
   useEffect(() => {
     function handleExprTok() {
-      if (user.data && user.token.isExpired === true) {
+      if (user?.data && user?.token.isExpired === true) {
         toast.warn("Login session expired");
         // signOut(user?.curFCMToken?.token);
 

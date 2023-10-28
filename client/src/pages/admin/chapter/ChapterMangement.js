@@ -75,7 +75,11 @@ const ChapterMangement = () => {
               <div className="flex flex-col w-full gap-2">
                 {chapters?.length > 0 ? (
                   chapters.map((chapter) => (
-                    <ChapterAccordion key={chapter._id} chapter={chapter} />
+                    <ChapterAccordion
+                      chaptersQueries={chaptersQueries}
+                      key={chapter._id}
+                      chapter={chapter}
+                    />
                   ))
                 ) : (
                   <div className="flex w-full justify-center items-center text-2xl text-gray-500 font-semibold">

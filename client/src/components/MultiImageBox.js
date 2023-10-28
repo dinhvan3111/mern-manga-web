@@ -114,7 +114,7 @@ const MultipleImageBox = ({
         id={name}
         className="hidden"
         type="file"
-        name="myImage"
+        name={name}
         multiple
         accept="image/*"
         onChange={(event) => {

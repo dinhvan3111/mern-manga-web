@@ -54,7 +54,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-const ChapterAccordion = ({ chapter }) => {
+const ChapterAccordion = ({ chaptersQueries, chapter }) => {
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState([...chapter.listImgUrl]);
   const [isDirty, setIsDirty] = useState(false);
@@ -89,6 +89,15 @@ const ChapterAccordion = ({ chapter }) => {
         queryClient.invalidateQueries(QUERY_KEY.CHAPTER_MANAGEMENT);
         toast.success("Update list images successful");
         setPopupMsg("Update list images  successful");
+        setSelectedImage([...res.data.listPublicUrl]);
+        queryClient.setQueryData(
+          [QUERY_KEY.CHAPTER_MANAGEMENT, chaptersQueries],
+          (chapters) => {
+            chapters.find((item) => item._id === chapter._id).listImgUrl =
+              res.data.listPublicUrl;
+            return chapters;
+          }
+        );
       }
     },
     onError: (error) => {
@@ -135,7 +144,6 @@ const ChapterAccordion = ({ chapter }) => {
     return updateChapterListImg;
   };
   useEffect(() => {
-    console.log(chapter.title, " ", selectedImage);
     if (JSON.stringify(selectedImage) !== JSON.stringify(chapter.listImgUrl)) {
       setIsDirty(true);
     } else {
@@ -177,6 +185,7 @@ const ChapterAccordion = ({ chapter }) => {
             <MultipleImageBox
               haveLabel
               label="Choose image"
+              name={chapter.title}
               selectedImage={selectedImage}
               initImages={chapter.listImgUrl}
               setSelectedImage={setSelectedImage}
