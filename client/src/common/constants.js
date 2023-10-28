@@ -8,6 +8,7 @@ export const SUBMIT_STATUS = {
   SUCCESS: "success",
   LOADING: "loading",
   FAILED: "failed",
+  ERROR: "error",
 };
 
 export const USER_MENU = {

@@ -53,7 +53,6 @@ const ConfirmPopup = ({
           buttonType={BUTTON_TYPE.NO_COLOR}
           onClick={handleReject}
           loading={isConfirming}
-          noGradient={true}
           variant="none"
           className="!px-8 !py-1 !rounded-lg !font-bold"
         >
@@ -65,7 +64,6 @@ const ConfirmPopup = ({
             handleReject();
           }}
           loading={isConfirming}
-          noGradient={true}
           className={` !text-white !px-8 !py-1 !rounded-lg ${yesClassName}`}
         >
           {yesBtnLabel}

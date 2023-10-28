@@ -32,6 +32,7 @@ export const API = {
       sortByTime ? `&sortByTime=${sortByTime}` : ""
     }`,
   GET_ALL_IMAGES_OF_CHAPTER: (id) => `/api/chapter/${id}/imgs`,
+  UPDATE_LIST_IMAGES_OF_CHAPTER: (id) => `/api/chapter/${id}/uploadListImgs`,
   UPDATE_CHAPTER: (id) => `/api/chapter/${id}`,
   DELETE_CHAPTER: (id) => `/api/chapter/${id}`,
 };

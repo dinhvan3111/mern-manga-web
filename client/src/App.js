@@ -18,6 +18,7 @@ import SearchMangaPage from "./pages/manga/SearchMangaPage";
 import AddMangaPage from "./pages/admin/AddMangaPage";
 import MangaMangament from "./pages/admin/MangaMangament";
 import ReadChapter from "./pages/chapter/ReadChapter";
+import ChapterMangement from "./pages/admin/chapter/ChapterMangement";
 
 function App() {
   const { user } = useSelector((state) => state.auth);
@@ -84,6 +85,15 @@ function App() {
             <Route
               path={PAGE_PATH.EDIT_MANGA()}
               element={<AddMangaPage />}
+            ></Route>
+          </Route>
+          <Route
+            path={PAGE_PATH.CHAPTERS_MANAGEMENT()}
+            element={<ProtectedRoute pageRole={[ROLE.ADMIN]} />}
+          >
+            <Route
+              path={PAGE_PATH.CHAPTERS_MANAGEMENT()}
+              element={<ChapterMangement />}
             ></Route>
           </Route>
         </Route>

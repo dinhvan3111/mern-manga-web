@@ -34,14 +34,15 @@ const AddMangaPage = () => {
     handleSubmit,
     control,
     setValue,
+    getValues,
     watch,
     reset,
     formState: { isSubmitting, errors, isDirty, isSubmitSuccessful },
   } = useForm({ resolver: yupResolver(addMangaSchema) });
   const [manga, setManga] = useState();
   const watchFile = watch("thumbnail");
+  const watchGenres = watch("genres", []);
   const [genres, setGenres] = useState([]);
-  const [selectedGenres, setSelectedGenres] = React.useState([]);
   const [addMangaMsg, setAddMangaMsg] = useState("");
   const [addMangaStatus, setAddMangaStatus] = useState();
   const [isFetchingGenres, setIsFetchingGenres] = useState(
@@ -58,12 +59,15 @@ const AddMangaPage = () => {
     const {
       target: { value },
     } = event;
-    setSelectedGenres(typeof value === "string" ? value.split(",") : value);
+    setValue("genres", typeof value === "string" ? value.split(",") : value, {
+      shouldDirty: true,
+    });
   };
   const setFormValue = (manga) => {
     let defaultValues = {};
     defaultValues.name = manga?.name;
     defaultValues.description = manga?.description;
+    defaultValues.genres = manga?.genres.map((genre) => genre.name);
     defaultValues.authors = manga.authors.join(",");
     defaultValues.artists = manga.artists.join(",");
     defaultValues.transTeam = manga.transTeam;
@@ -75,7 +79,7 @@ const AddMangaPage = () => {
     //   setValue("authors", manga.authors.join(","));
     //   setValue("artists", manga.artists.join(","));
     //   setValue("transTeam", manga.transTeam);
-    setSelectedGenres(manga.genres);
+    // setSelectedGenres(manga.genres);
     setManga(manga);
     // }
   };
@@ -91,7 +95,6 @@ const AddMangaPage = () => {
     if (addMangaStatus === SUBMIT_STATUS.FAILED) return;
     if (isAddPage) {
       reset();
-      setSelectedGenres([]);
     } else {
       reset({}, { keepValues: true });
     }
@@ -151,9 +154,6 @@ const AddMangaPage = () => {
   const onSubmit = async (data) => {
     handleOpenAddStatusModal();
     setAddMangaStatus(SUBMIT_STATUS.LOADING);
-    const authors = data.authors.split(",");
-    const artists = data.artists.split(",");
-    const listSelectedGenreIds = selectedGenres.map((item) => item._id);
     const files = data.thumbnail;
     const formData = new FormData();
     Object.keys(files).forEach((key) =>
@@ -163,10 +163,14 @@ const AddMangaPage = () => {
       name: data.name,
       description: data.description,
       // thumbUrl: publicThumbUrl,
-      authors: authors,
-      artists: artists,
+      authors: data.authors.split(","),
+      artists: data.artists.split(","),
       transTeam: data.transTeam,
-      genres: listSelectedGenreIds,
+      genres: genres
+        .filter((item) =>
+          getValues("genres").some((genre) => genre === item.name)
+        )
+        .map((genre) => genre._id),
     };
     if (isAddPage) {
       await addManga(formData, submitData);
@@ -242,30 +246,30 @@ const AddMangaPage = () => {
                     <MultiTagSelectDropdown
                       control={control}
                       name="genres"
-                      items={genres}
-                      selectedItems={selectedGenres}
+                      items={genres.map((item) => item.name)}
+                      selectedItems={watchGenres}
                       handleChange={handleChange}
                       renderValue={(selected) => (
                         <div className="flex gap-2">
                           {selected.map((item) => (
                             <div
-                              key={item._id}
+                              key={item}
                               className="flex gap-1 items-center bg-gray-100 rounded-md p-1"
                             >
-                              <span>{item.name}</span>
+                              <span>{item}</span>
                             </div>
                           ))}
                         </div>
                       )}
                       menuItem={(genre) => (
-                        <MenuItem key={genre._id} value={genre}>
+                        <MenuItem key={genre} value={genre}>
                           <Checkbox
                             style={{
                               color: "orange",
                             }}
-                            checked={selectedGenres.indexOf(genre) > -1}
+                            checked={watchGenres?.indexOf(genre) > -1}
                           />
-                          <ListItemText primary={genre.name} />
+                          <ListItemText primary={genre} />
                         </MenuItem>
                       )}
                     ></MultiTagSelectDropdown>

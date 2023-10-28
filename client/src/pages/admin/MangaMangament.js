@@ -7,6 +7,7 @@ import { BiStar } from "react-icons/bi";
 import BasicTag from "../../components/tag/BasicTag";
 import { mangaStatusToString } from "../../util/stringHelper";
 import { AiFillDelete, AiFillEdit, AiFillFileAdd } from "react-icons/ai";
+import { GrChapterAdd } from "react-icons/gr";
 import { CircularProgress, IconButton } from "@mui/material";
 import BasicPagination from "../../components/pagination/Pagination";
 import BasicButton from "../../components/button/BasicButton";
@@ -15,32 +16,35 @@ import usePopup from "../../hooks/usePopup";
 import PopupMsg from "../../components/popup/PopupMessage";
 import ConfirmPopup from "../../components/popup/ConfirmPopup";
 import AsyncImage from "../../components/AsyncImage";
+import { useQuery } from "react-query";
+import QUERY_KEY from "../../common/queryKey";
 
 const ITEMS_PER_PAGE = 10;
 
 const MangaMangament = () => {
   const navigate = useNavigate();
-  const [mangaList, setMangaList] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [mangaQueries, setMangaQueries] = useState({
+    currentPage: 1,
+    pageSize: ITEMS_PER_PAGE,
+  });
+  const { data: mangaList, isLoading } = useQuery({
+    queryKey: [QUERY_KEY.MANGA_MANAGEMENT, mangaQueries],
+    queryFn: () =>
+      fetchMangaList(mangaQueries.currentPage, mangaQueries.pageSize),
+  });
   const [totalPage, setTotalPage] = useState();
-  const [isLoading, setIsLoading] = useState(false);
   const fetchMangaList = async (page = 1) => {
-    setIsLoading(true);
     const res = await mangaApi.getAllMangas(page, ITEMS_PER_PAGE, {});
     if (res.success) {
-      setMangaList(res.data.docs);
-      setCurrentPage(res.data.page);
       setTotalPage(res.data.totalPages);
+      return res.data.docs;
     }
-    setIsLoading(false);
+    return [];
   };
   const handlePageClick = async (event) => {
     const page = event.selected + 1;
-    await fetchMangaList(page);
+    setMangaQueries({ ...mangaQueries, currentPage: page });
   };
-  useEffect(() => {
-    fetchMangaList(1);
-  }, []);
   return (
     <div className="page-wrapper">
       <div className="flex justify-between">
@@ -57,7 +61,7 @@ const MangaMangament = () => {
         <BasicPagination
           handlePageClick={handlePageClick}
           pageCount={totalPage}
-          currentPage={currentPage}
+          currentPage={mangaQueries.currentPage}
         >
           {isLoading ? (
             <div className="mb-10 flex justify-center items-center">
@@ -161,6 +165,11 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
               onClick={() => navigate(PAGE_PATH.EDIT_MANGA(manga._id))}
             >
               <AiFillEdit color="green" />
+            </IconButton>
+            <IconButton
+              onClick={() => navigate(PAGE_PATH.CHAPTERS_MANAGEMENT(manga._id))}
+            >
+              <GrChapterAdd color="gray" />
             </IconButton>
             <IconButton onClick={handleOpenConfirmPopup}>
               <AiFillDelete color="red" />

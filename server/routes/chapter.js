@@ -39,7 +39,7 @@ router.post("/", verifyToken, async (req, res) => {
   if (req.user.role !== ROLE.ADMIN) {
     return res.status(401).json({
       success: false,
-      message: "You don't have permission to update this chapter",
+      message: "You don't have permission to add chapter",
     });
   }
   const { mangaId, title, listThumbUrl } = req.body;
@@ -76,11 +76,59 @@ router.post("/", verifyToken, async (req, res) => {
   }
 });
 
-// @route POST api/chapter/uploadListImgs
+// @route GET api/chapter
+// @desc Get all chapter
+// @access Public
+router.get("/:id", async (req, res) => {
+  const { page, limit, sortByTime } = req.query;
+  if (
+    !numberUtils.isNumberic(page) ||
+    !numberUtils.isNumberic(limit) ||
+    numberUtils.toNum(page) < 0 ||
+    numberUtils.toNum(limit) <= 0
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data",
+    });
+  }
+  if (
+    sortByTime &&
+    (!numberUtils.isNumberic(sortByTime) ||
+      (numberUtils.toNum(sortByTime) !== -1 &&
+        numberUtils.toNum(sortByTime) !== 1))
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid data",
+    });
+  }
+  const conditions = { mangaId: req.params.id };
+  try {
+    const chapters = await chapterModel.getMore(
+      conditions,
+      page,
+      limit,
+      "_id mangaId title listImgUrl publishDate",
+      {
+        ...(sortByTime && { publishDate: sortByTime }),
+      }
+    );
+    res.json({
+      success: true,
+      data: chapters,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// @route POST api/chapter/:id/uploadListImgs
 // @desc Upload chapter's image
 // @access Private
 router.post(
-  "/uploadListImgs/:id",
+  "/:id/uploadListImgs",
   verifyToken,
   fileUpload({ createParentPath: true }),
   filePayloadExists,
@@ -89,8 +137,6 @@ router.post(
   async (req, res) => {
     const chapterId = req.params.id;
     const files = req.files;
-    // console.log("chapterId", chapterId);
-    // const dateTime = getCurrentDateTime();
     const chapter = await Chapter.findOne({ _id: chapterId });
     if (!chapter) {
       return res.status(400).json({
@@ -153,54 +199,6 @@ router.post(
     });
   }
 );
-
-// @route GET api/chapter
-// @desc Get all chapter
-// @access Public
-router.get("/:id", async (req, res) => {
-  const { page, limit, sortByTime } = req.query;
-  if (
-    !numberUtils.isNumberic(page) ||
-    !numberUtils.isNumberic(limit) ||
-    numberUtils.toNum(page) < 0 ||
-    numberUtils.toNum(limit) <= 0
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid data",
-    });
-  }
-  if (
-    sortByTime &&
-    (!numberUtils.isNumberic(sortByTime) ||
-      (numberUtils.toNum(sortByTime) !== -1 &&
-        numberUtils.toNum(sortByTime) !== 1))
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid data",
-    });
-  }
-  const conditions = { mangaId: req.params.id };
-  try {
-    const chapters = await chapterModel.getMore(
-      conditions,
-      page,
-      limit,
-      "_id mangaId title listImgUrl publishDate",
-      {
-        ...(sortByTime && { publishDate: sortByTime }),
-      }
-    );
-    res.json({
-      success: true,
-      data: chapters,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  }
-});
 
 // @route GET api/chapter/:id/img
 // @desc Get all chapter's images

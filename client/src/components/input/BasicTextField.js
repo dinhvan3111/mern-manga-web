@@ -12,7 +12,7 @@ const BasicTextField = ({
   variant = "outlined",
   defaultValue = "",
   size = "small",
-  control,
+  control = null,
   helperText = "",
   errMsg = false,
   hasErrors = false,
@@ -20,11 +20,15 @@ const BasicTextField = ({
   textfieldType = TextFieldType.LIGHT,
   ...props
 }) => {
-  const { field } = useController({
-    control,
-    name,
-    defaultValue,
-  });
+  const { field } = useController(
+    control
+      ? {
+          control,
+          name,
+          defaultValue,
+        }
+      : {}
+  );
 
   return (
     <div className={wrapperClass}>

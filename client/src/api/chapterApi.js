@@ -51,6 +51,28 @@ const chapterApi = {
       console.log(error);
     }
   },
+  updateListImgsOfChapter: async (id, data) => {
+    const url = API.UPDATE_LIST_IMAGES_OF_CHAPTER(id);
+    try {
+      // const res = await axios.post(url, data, {
+      //   baseURL: Config.apiConfig.endPoint,
+      //   headers: {
+      //     "Content-Type": "multipart/form-data",
+      //     Authorization: `Bearer ${
+      //       store.getState()?.auth?.user?.token?.accessToken
+      //     }`,
+      //   },
+      // });
+      const res = await axiosClient.post(url, data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 export default chapterApi;
