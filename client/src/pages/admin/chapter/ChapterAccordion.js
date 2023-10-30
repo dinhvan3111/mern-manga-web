@@ -74,7 +74,7 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
     },
     onError: (error) => {
       console.log(error);
-      toast.success("Delete chapter failed");
+      toast.error("Delete chapter failed");
       setPopupMsg("Delete chapter failed");
     },
   });
@@ -89,12 +89,12 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
         queryClient.invalidateQueries(QUERY_KEY.CHAPTER_MANAGEMENT);
         toast.success("Update list images successful");
         setPopupMsg("Update list images  successful");
-        setSelectedImage([...res.data.listPublicUrl]);
+        setSelectedImage([...res.data.chapter.listImgUrl]);
         queryClient.setQueryData(
           [QUERY_KEY.CHAPTER_MANAGEMENT, chaptersQueries],
           (chapters) => {
             chapters.find((item) => item._id === chapter._id).listImgUrl =
-              res.data.listPublicUrl;
+              res.data.chapter.listImgUrl;
             return chapters;
           }
         );
@@ -102,7 +102,7 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
     },
     onError: (error) => {
       console.log(error);
-      toast.success("Update list images failed");
+      toast.error("Update list images failed");
       setPopupMsg("Update list images failed");
     },
   });
@@ -133,15 +133,35 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
     setIsDirty(false);
   };
   const handleUpdateListImg = async () => {
-    const formData = new FormData();
-    Object.keys(selectedImage).forEach((key) => {
-      formData.append(key, selectedImage[key]);
-    });
-    const updateChapterListImg = await chapterApi.updateListImgsOfChapter(
-      chapter._id,
-      selectedImage
+    const listNewFile = selectedImage.filter((item) =>
+      File.prototype.isPrototypeOf(item)
     );
-    return updateChapterListImg;
+    let updateListNewFileRes;
+    let listNewImgUrl = selectedImage;
+    if (listNewFile.length > 0) {
+      const formData = new FormData();
+      Object.keys(listNewFile).forEach((key) => {
+        formData.append(key, listNewFile[key]);
+      });
+      updateListNewFileRes = await chapterApi.updateListImgsOfChapter(
+        chapter._id,
+        formData
+      );
+      if (!updateListNewFileRes.success) return updateListNewFileRes;
+      let resIndex = 0;
+      listNewImgUrl.forEach((item, index) => {
+        if (File.prototype.isPrototypeOf(item)) {
+          listNewImgUrl[index] =
+            updateListNewFileRes.data.listPublicUrl[resIndex];
+          resIndex++;
+        }
+      });
+    }
+    const updateChapterRes = await chapterApi.updateChapter(chapter._id, {
+      title: chapter.title,
+      listImgUrl: listNewImgUrl,
+    });
+    return updateChapterRes;
   };
   useEffect(() => {
     if (JSON.stringify(selectedImage) !== JSON.stringify(chapter.listImgUrl)) {
@@ -187,7 +207,6 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
               label="Choose image"
               name={chapter.title}
               selectedImage={selectedImage}
-              initImages={chapter.listImgUrl}
               setSelectedImage={setSelectedImage}
             ></MultipleImageBox>
           </div>

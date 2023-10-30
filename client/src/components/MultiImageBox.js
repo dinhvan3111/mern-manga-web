@@ -8,7 +8,6 @@ const MultipleImageBox = ({
   name = "upload",
   setSelectedImage = () => {},
   selectedImage = [],
-  initImages = [],
   setPathName = () => {},
   label = null,
   haveLabel = false,
@@ -16,9 +15,6 @@ const MultipleImageBox = ({
   ...props
 }) => {
   const [checked, setChecked] = useState([]);
-  const [isFirstTimeEditImg, setIsFirstTimeEditImg] = useState(
-    initImages.length > 0 || selectedImage.length !== 0
-  );
   const files = Array.from(selectedImage);
   const onDelete = () => {
     const filter = files.filter((item) => !checked.includes(item));
@@ -31,15 +27,6 @@ const MultipleImageBox = ({
       setChecked(filenames);
     } else setChecked([]);
   };
-  useEffect(() => {
-    if (
-      initImages.length > 0 &&
-      selectedImage.length > 0 &&
-      JSON.stringify(initImages) === JSON.stringify(selectedImage)
-    ) {
-      setIsFirstTimeEditImg(true);
-    }
-  }, [selectedImage]);
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
@@ -56,7 +43,7 @@ const MultipleImageBox = ({
               <MdDeleteOutline className="w-5 h-5" /> Delete all
             </button>
           )}
-          {!isFirstTimeEditImg && files.length > 0 && (
+          {files.length > 0 && (
             <button
               type="button"
               className={`text-white ${
@@ -90,7 +77,6 @@ const MultipleImageBox = ({
               index={index}
               checked={checked}
               setChecked={setChecked}
-              isFirstTimeEditImg={isFirstTimeEditImg}
             />
           ))}
         <label
@@ -99,15 +85,9 @@ const MultipleImageBox = ({
             files.length > 0 && "ml-10"
           } flex items-center gap-2 justify-center flex-col bg-white rounded-lg border border-dashed border-neutral-400 text-neutral-400 text-sm cursor-pointer`}
         >
-          {isFirstTimeEditImg ? (
-            <>
-              <GrEdit size={15} /> Edit
-            </>
-          ) : (
-            <>
-              <GrAdd size={15} /> Add
-            </>
-          )}
+          <>
+            <GrAdd size={15} /> Add
+          </>
         </label>
       </div>
       <input
@@ -122,12 +102,7 @@ const MultipleImageBox = ({
           const newFiles = Array.from(event.target.files)?.filter(
             (item) => !filenames.includes(item.name)
           );
-          if (isFirstTimeEditImg) {
-            setIsFirstTimeEditImg(false);
-            setSelectedImage(newFiles);
-          } else {
-            setSelectedImage([...selectedImage, ...newFiles]);
-          }
+          setSelectedImage([...selectedImage, ...newFiles]);
           event.target.value = null;
         }}
       />
@@ -135,13 +110,7 @@ const MultipleImageBox = ({
   );
 };
 
-const ImageItem = ({
-  item,
-  index,
-  checked = [],
-  setChecked = () => {},
-  isFirstTimeEditImg,
-}) => {
+const ImageItem = ({ item, index, checked = [], setChecked = () => {} }) => {
   const isFile = File.prototype.isPrototypeOf(item);
   const isChecked = checked.includes(item);
   const handleChange = (e) => {
@@ -159,14 +128,12 @@ const ImageItem = ({
       <span className="basis-1/6">{index + 1}.</span>
       <div className="basis-4/6">
         <div className="relative w-28 h-28 bg-white rounded-lg border-2 border-dashed order-neutral-400 p-1">
-          {!isFirstTimeEditImg && (
-            <Checkbox
-              className="!absolute -top-3 -right-3"
-              {...label}
-              checked={isChecked}
-              onChange={handleChange}
-            />
-          )}
+          <Checkbox
+            className="!absolute -top-3 -right-3"
+            {...label}
+            checked={isChecked}
+            onChange={handleChange}
+          />
           <img
             alt="not found"
             className="object-contain w-full h-full rounded-lg"

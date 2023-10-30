@@ -26,6 +26,7 @@ const {
 } = require("firebase/storage");
 const firebaseConfig = require("../config/firebase.config");
 const getCurrentDateTime = require("../utils/timeUtils");
+const chapter = require("../models/chapter");
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
@@ -42,7 +43,7 @@ router.post("/", verifyToken, async (req, res) => {
       message: "You don't have permission to add chapter",
     });
   }
-  const { mangaId, title, listThumbUrl } = req.body;
+  const { mangaId, title, listImgUrl } = req.body;
   if (!mangaId || !title) {
     return res.status(400).json({
       success: false,
@@ -53,7 +54,7 @@ router.post("/", verifyToken, async (req, res) => {
     const newChapter = await Chapter({
       mangaId,
       title,
-      listThumbUrl: listThumbUrl || [],
+      listImgUrl: listImgUrl || [],
     });
     await newChapter.save();
     await Manga.findOneAndUpdate(
@@ -145,21 +146,12 @@ router.post(
       });
     }
     const mangaId = new ObjectId(chapter.mangaId).valueOf();
-    // console.log("chapter", chapter);
-    // console.log("object", chapter.mangaId);
-    // console.log("mangaId", mangaId);
-    // Delete list Imgs
-    const listImgsRef = ref(storage, `manga/${mangaId}/chapters/${chapterId}`);
     var listPublicUrl = new Array();
     try {
-      const listAllFileRef = await listAll(listImgsRef);
-      if (listAllFileRef.items.length) {
-        listAllFileRef.items.forEach(async (itemRef) => deleteObject(itemRef));
-      }
       const promises = Object.keys(files).map(async (key) => {
         const storageRef = ref(
           storage,
-          `manga/${mangaId}/chapters/${chapterId}/${key}`
+          `manga/${mangaId}/chapters/${chapterId}/${files[key].name}`
         );
 
         // Create file metadata including the content type
@@ -180,10 +172,6 @@ router.post(
       });
       const arrUrl = await Promise.all(promises);
       arrUrl.forEach((item) => listPublicUrl.push(item));
-      const updateThumbUrlMangaRes = await Chapter.updateOne(
-        { _id: chapterId },
-        { $set: { listImgUrl: listPublicUrl } }
-      );
     } catch (error) {
       console.log(error);
       res
@@ -233,18 +221,34 @@ router.put("/:id", verifyToken, async (req, res) => {
     });
   }
   const chapterId = req.params.id;
-  const { title, listThumbUrl } = req.body;
+  const { title, listImgUrl } = req.body;
   if (!chapterId || !title) {
     return res.status(400).json({
       success: false,
       message: "Chapter's manga id and chapter's title are required",
     });
   }
+  const chapter = await Chapter.findOne({ _id: chapterId });
+  if (!chapter) {
+    return res.status(400).json({
+      success: false,
+      message: "Couldn't find this chapter",
+    });
+  }
+  // Filter list url exist in old list but not in new list to delete on Firebase
+  const listDeleteImgUrl = chapter.listImgUrl.filter(
+    (img) => !listImgUrl.includes(img)
+  );
+
   try {
     const chapterUpdateCondition = { _id: chapterId };
+    listDeleteImgUrl.forEach((imgUrl) => {
+      let imgRef = ref(storage, imgUrl);
+      deleteObject(imgRef);
+    });
     let updateChapter = {
       title,
-      listThumbUrl: listThumbUrl || [],
+      listImgUrl: listImgUrl || [],
     };
     updateChapter = await Chapter.findOneAndUpdate(
       chapterUpdateCondition,
@@ -259,8 +263,8 @@ router.put("/:id", verifyToken, async (req, res) => {
     }
     res.json({
       success: true,
-      message: "Create chapter successfully",
-      chapter: updateChapter,
+      message: "Update chapter successfully",
+      data: { chapter: updateChapter },
     });
   } catch (error) {
     console.log(error);
