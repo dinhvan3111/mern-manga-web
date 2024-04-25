@@ -43,6 +43,13 @@ router.post("/", verifyToken, async (req, res) => {
       message: "You don't have permission to add chapter",
     });
   }
+  // Check if user is not admin
+  if (req.user.role !== ROLE.ADMIN) {
+    return res.status(401).json({
+      success: false,
+      message: "You don't have permission to update this manga",
+    });
+  }
   const { mangaId, title, listImgUrl } = req.body;
   if (!mangaId || !title) {
     return res.status(400).json({
@@ -136,6 +143,13 @@ router.post(
   fileExtLimiter([".png", ".jpg", ".jpeg"]),
   fileSizeLimiter,
   async (req, res) => {
+    // Check if user is not admin
+    if (req.user.role !== ROLE.ADMIN) {
+      return res.status(401).json({
+        success: false,
+        message: "You don't have permission to update this manga",
+      });
+    }
     const chapterId = req.params.id;
     const files = req.files;
     const chapter = await Chapter.findOne({ _id: chapterId });
@@ -276,6 +290,13 @@ router.put("/:id", verifyToken, async (req, res) => {
 // @desc Delete chapter
 // @access Private
 router.delete("/:id", verifyToken, async (req, res) => {
+  // Check if user is not admin
+  if (req.user.role !== ROLE.ADMIN) {
+    return res.status(401).json({
+      success: false,
+      message: "You don't have permission to update this manga",
+    });
+  }
   try {
     const chapterDeleteCondition = { _id: req.params.id };
     const deletedChapter = await Chapter.findOneAndDelete(

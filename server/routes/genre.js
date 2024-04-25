@@ -10,7 +10,13 @@ const Genre = require("../models/genre");
 // @access Private
 router.post("/", verifyToken, async (req, res) => {
   const { name, description } = req.body;
-
+  // Check if user is not admin
+  if (req.user.role !== ROLE.ADMIN) {
+    return res.status(401).json({
+      success: false,
+      message: "You don't have permission to update this manga",
+    });
+  }
   // Simple validation
   if (!name) {
     return res.status(400).json({

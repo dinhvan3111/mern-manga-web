@@ -46,6 +46,13 @@ router.post("/", verifyToken, async (req, res) => {
     transTeam,
     status,
   } = req.body;
+  // Check if user is not admin
+  if (req.user.role !== ROLE.ADMIN) {
+    return res.status(401).json({
+      success: false,
+      message: "You don't have permission to update this manga",
+    });
+  }
   // Simple validation
   if (!name || !description) {
     return res.status(400).json({
@@ -323,6 +330,13 @@ router.put("/:id", verifyToken, async (req, res) => {
 // @desc Delete manga
 // @access Private
 router.delete("/:id", verifyToken, async (req, res) => {
+  // Check if user is not admin
+  if (req.user.role !== ROLE.ADMIN) {
+    return res.status(401).json({
+      success: false,
+      message: "You don't have permission to update this manga",
+    });
+  }
   try {
     const mangatDeleteCondition = { _id: req.params.id };
     const deletedManga = await Manga.findOneAndDelete(mangatDeleteCondition);
@@ -357,6 +371,13 @@ router.post(
   fileExtLimiter([".png", ".jpg", ".jpeg"]),
   fileSizeLimiter,
   async (req, res) => {
+    // Check if user is not admin
+    if (req.user.role !== ROLE.ADMIN) {
+      return res.status(401).json({
+        success: false,
+        message: "You don't have permission to update this manga",
+      });
+    }
     const id = req.params.id;
     const files = req.files;
     const dateTime = getCurrentDateTime();
