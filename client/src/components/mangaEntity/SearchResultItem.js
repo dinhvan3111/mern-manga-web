@@ -14,7 +14,7 @@ const SearchResultItem = ({ manga }) => {
         className="max-w-[84px] min-w-[84px] h-full cursor-pointer"
         onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
       >
-        <AsyncImage src={manga.thumbUrl} alt="img" />
+        <AsyncImage src={manga?.thumbUrl} alt="img" />
       </div>
       <div className="flex flex-col gap-2 grow w-full">
         <div
@@ -23,7 +23,7 @@ const SearchResultItem = ({ manga }) => {
         >
           <div className="sm:flex justify-between">
             <h4 className="text-lg break-words font-bold line-clamp-1 h-fit">
-              {manga.name}
+              {manga?.name}
             </h4>
             <div className="flex items-center gap-4">
               <div className="flex gap-1 items-center">
@@ -54,7 +54,7 @@ const SearchResultItem = ({ manga }) => {
             ))}
           </div>
           <p className="text-base break-words line-clamp-2 text-ellipsis">
-            {manga.description}
+            {manga?.description}
           </p>
         </div>
         {/* <div className="flex justify-between items-center">

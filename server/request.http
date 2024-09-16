@@ -131,7 +131,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhO
 
 ### GET LIST FAV
 GET http://localhost:5000/api/favourite?page=1&limit=10 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTE0M2UyYzAxMDQ0NzcxYjUzYzciLCJyb2xlIjoyLCJpYXQiOjE2OTc1MTUzNjIsImV4cCI6MTY5NzYwMTc2Mn0.X8iZXfv5tDIjEkXW92VSJtkY9l5mBsK99CbdbpXi-7M
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTFhOTE0M2UyYzAxMDQ0NzcxYjUzYzciLCJyb2xlIjoyLCJpYXQiOjE3MjY1MDE5MzksImV4cCI6MTcyNjUwMjgzOX0.uPm7KDuOcxglrBiYVcYzHYVR48LtTCT_IuqT6QxXASY
 
 ### REMOVE MANGA FROM FAV
 DELETE http://localhost:5000/api/favourite HTTP/1.1

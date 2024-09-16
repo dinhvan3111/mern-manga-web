@@ -100,7 +100,7 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
     handleCloseConfirmPopup();
     setDeleteStatus(SUBMIT_STATUS.LOADING);
     handleOpenStatusPopup();
-    const res = await mangaApi.deleteManga(manga._id);
+    const res = await mangaApi.deleteManga(manga?._id);
     if (res.success) {
       setDeleteStatus(SUBMIT_STATUS.SUCCESS);
       setPopupMsg("Delete manga successful");
@@ -117,7 +117,7 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
           className="max-w-[84px] min-w-[84px] h-full cursor-pointer"
           onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
         >
-          <AsyncImage src={manga.thumbUrl} alt="img" />
+          <AsyncImage src={manga?.thumbUrl} alt="img" />
         </div>
         <div className="flex justify-between gap-2 w-full">
           <div
@@ -126,7 +126,7 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
           >
             <div className="flex justify-between">
               <h4 className="text-lg break-all font-bold line-clamp-1 text-ellipsis">
-                {manga.name}
+                {manga?.name}
               </h4>
             </div>
             <div className="flex items-center gap-4">
@@ -157,7 +157,7 @@ const MangaManageItem = ({ manga, onHasChangeMangaList = () => {} }) => {
               ))}
             </div>
             <p className="text-base break-all line-clamp-2 text-ellipsis">
-              {manga.description}
+              {manga?.description}
             </p>
           </div>
           <div className="flex flex-1 items-center justify-end">

@@ -25,6 +25,7 @@ import { useSelector } from "react-redux";
 
 const MangaDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [manga, setManga] = useState();
   const [chapters, setChapters] = useState([]);
   const [isLoadingChapter, setIsLoadingChapter] = useState(true);
@@ -46,6 +47,10 @@ const MangaDetailPage = () => {
       }
       setIsLoading(false);
     };
+    if (!id) {
+      navigate(PAGE_PATH.NOT_FOUND);
+      return;
+    }
     fetchMangaDetail(id);
   }, [id]);
   useEffect(() => {
@@ -64,6 +69,10 @@ const MangaDetailPage = () => {
       }
       setIsLoadingChapter(false);
     };
+    if (!id) {
+      navigate(PAGE_PATH.NOT_FOUND);
+      return;
+    }
     fetchAllMangaChapter(id);
   }, [currentSortChapter]);
   return isLoading ? (
@@ -264,7 +273,7 @@ const MangaDetailContent = ({
                   <div className="bg-white rounded-md w-32 sm:w-52 h-fit drop-shadow-xl">
                     <AsyncImage
                       imgClassName="object-fit"
-                      src={manga.thumbUrl}
+                      src={manga?.thumbUrl}
                       skeletonHeight={300}
                       alt="img"
                     />

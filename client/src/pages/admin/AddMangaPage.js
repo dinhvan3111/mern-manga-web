@@ -68,9 +68,9 @@ const AddMangaPage = () => {
     defaultValues.name = manga?.name;
     defaultValues.description = manga?.description;
     defaultValues.genres = manga?.genres.map((genre) => genre.name);
-    defaultValues.authors = manga.authors.join(",");
-    defaultValues.artists = manga.artists.join(",");
-    defaultValues.transTeam = manga.transTeam;
+    defaultValues.authors = manga?.authors.join(",");
+    defaultValues.artists = manga?.artists.join(",");
+    defaultValues.transTeam = manga?.transTeam;
     reset({ ...defaultValues });
     // if (manga) {
     //   setValue("name", manga.name);
@@ -114,7 +114,7 @@ const AddMangaPage = () => {
         // If thumbnail not empty
         if (!formData.entries().next().done) {
           const uploadThumbRes = await mangaApi.uploadMangaThumb(
-            createRes.manga._id,
+            createRes.manga?._id,
             formData
           );
         }
@@ -136,7 +136,7 @@ const AddMangaPage = () => {
         // If thumbnail not empty
         if (!formData.entries().next().done) {
           const uploadThumbRes = await mangaApi.uploadMangaThumb(
-            createRes.manga._id,
+            createRes.manga?._id,
             formData
           );
         }

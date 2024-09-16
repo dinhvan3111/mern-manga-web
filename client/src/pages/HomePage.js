@@ -175,7 +175,7 @@ const BasicMangaEntity = ({ manga, ...props }) => {
           alt="img"
           skeletonHeight={80}
           src={
-            manga.thumbUrl !== ""
+            manga?.thumbUrl !== ""
               ? manga.thumbUrl
               : "/images/no_manga_thumb.png"
           }
@@ -187,11 +187,11 @@ const BasicMangaEntity = ({ manga, ...props }) => {
           onClick={() => navigate(PAGE_PATH.MANGA_DETAIL(manga?._id))}
         >
           <h4 className="text-base break-all font-bold line-clamp-1 text-ellipsis">
-            {manga.name}
+            {manga?.name}
           </h4>
           <p className="text-base break-all line-clamp-1 text-ellipsis">
-            {manga.chapters.length > 0
-              ? manga.chapters[0].title
+            {manga?.chapters.length > 0
+              ? manga?.chapters[0].title
               : "No chapters yet"}
           </p>
         </div>
@@ -199,11 +199,11 @@ const BasicMangaEntity = ({ manga, ...props }) => {
           <div className="flex gap-2 items-center">
             <RiGroupLine size={15} />
             <h4 className="p-1 text-sm line-clamp-1 text-ellipsis basic-hover">
-              {manga.authors.length > 0 ? manga.authors.join(",") : "Unknown"}
+              {manga?.authors.length > 0 ? manga?.authors.join(",") : "Unknown"}
             </h4>
           </div>
           <h4 className="text-sm">
-            {getDateDiff(dateToTs(manga.latestUpdate))}
+            {getDateDiff(dateToTs(manga?.latestUpdate))}
           </h4>
         </div>
       </div>

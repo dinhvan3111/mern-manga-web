@@ -289,7 +289,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   const oldManga = await Manga.findOne({ _id: req.params.id });
   try {
     let updatedManga = {
-      name: name || oldManga.name,
+      name: name || oldManga?.name,
       description: description || oldManga.description,
       ...(thumbUrl && {
         thumbUrl: thumbUrl.startsWith("https://")
