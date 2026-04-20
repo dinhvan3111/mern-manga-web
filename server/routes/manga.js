@@ -14,23 +14,11 @@ const fileExtLimiter = require("../middleware/fileExtLimiter.middleware");
 const fileSizeLimiter = require("../middleware/fileSizeLimiter.middleware");
 const multer = require("multer");
 const firebase = require("firebase/app");
-// const getAnalytics = require("firebase/analytics");
-const {
-  getStorage,
-  ref,
-  deleteObject,
-  getDownloadURL,
-  uploadBytesResumable,
-  listAll,
-  list,
-} = require("firebase/storage");
-const firebaseConfig = require("../config/firebase.config");
 const getCurrentDateTime = require("../utils/timeUtils");
+const StorageContainer = require("../services/storages/StorageContainer");
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const storage = getStorage();
-const upload = multer({ storage: multer.memoryStorage() });
+const storageService = StorageContainer.resolve();
+
 
 // @route POST api/manga
 // @desc Create manga
@@ -339,6 +327,26 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
   try {
     const mangatDeleteCondition = { _id: req.params.id };
+    const mangaDelete = await Manga.findOne(mangatDeleteCondition).populate("chapters");
+    if(!mangaDelete){
+        return res.status(401).json({
+        success: false,
+        message: "Manga not found or user not authorized",
+      });
+    }
+    if(mangaDelete.chapters.length > 0){
+      await Promise.all(
+        mangaDelete.chapters.map(async (chapter) => {
+          const chapterDeleteCondition = { _id: chapter._id };
+          const deletedChapter = await chapter.findOneAndDelete(
+            chapterDeleteCondition
+          );
+          if (deletedChapter) {
+            storageService.delete(imgUrl)
+          }
+        })
+      );
+    }
     const deletedManga = await Manga.findOneAndDelete(mangatDeleteCondition);
 
     // User not authorized or manga not found
@@ -380,46 +388,42 @@ router.post(
     }
     const id = req.params.id;
     const files = req.files;
+    if(!files) {
+      return res.status(400).json({
+        success: false,
+        message: "No files uploaded",
+      });
+    }
     const dateTime = getCurrentDateTime();
     // Delete the previous thumnail
-    const thumbnailRef = ref(storage, `manga/${id}/thumbnail`);
     var listPublicUrl = new Array();
     try {
-      const listAllFileRef = await listAll(thumbnailRef);
-      if (listAllFileRef.items.length) {
-        listAllFileRef.items.forEach(async (itemRef) => deleteObject(itemRef));
+      const folderPath = `manga/${id}/thumbnail`;
+      const existingFiles = await storageService.getAllFiles(folderPath);
+      if(existingFiles.length > 0)
+      {
+        await storageService.deleteAll(folderPath);
       }
       const promises = Object.keys(files).map(async (key) => {
-        const storageRef = ref(
-          storage,
-          `manga/${id}/thumbnail/${files[key].name + "_" + dateTime}`
-        );
+        const destination = `manga/${id}/thumbnail`;
 
-        // Create file metadata including the content type
-        const metadata = {
-          contentType: files[key].mimetype,
+        const file = {
+          buffer:       files[key].data,
+          mimetype:     files[key].mimetype,
+          originalname: files[key].name + "_" + dateTime,
         };
 
-        // Upload the file in the bucket storage
-        const snapshot = await uploadBytesResumable(
-          storageRef,
-          files[key].data,
-          metadata
-        );
-
-        // Grab the public url
-        const downloadUrl = await getDownloadURL(snapshot.ref);
-        return downloadUrl;
+        return await storageService.upload(file, destination);
       });
-      const arrUrl = await Promise.all(promises);
-      arrUrl.forEach((item) => listPublicUrl.push(item));
+
+      listPublicUrl = await Promise.all(promises);
       const updateThumbUrlMangaRes = await Manga.updateOne(
         { _id: id },
         { $set: { thumbUrl: listPublicUrl[0] } }
       );
     } catch (error) {
       console.log(error);
-      res
+      return res
         .status(500)
         .json({ success: false, message: "Internal server error" });
     }

@@ -13,25 +13,12 @@ const fileExtLimiter = require("../middleware/fileExtLimiter.middleware");
 const fileSizeLimiter = require("../middleware/fileSizeLimiter.middleware");
 const multer = require("multer");
 const ObjectId = require("mongodb").ObjectId;
-const firebase = require("firebase/app");
-// const getAnalytics = require("firebase/analytics");
-const {
-  getStorage,
-  ref,
-  deleteObject,
-  getDownloadURL,
-  uploadBytesResumable,
-  listAll,
-  list,
-} = require("firebase/storage");
-const firebaseConfig = require("../config/firebase.config");
 const getCurrentDateTime = require("../utils/timeUtils");
 const chapter = require("../models/chapter");
+const StorageContainer = require("../services/storages/StorageContainer");
 
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const storage = getStorage();
-const upload = multer({ storage: multer.memoryStorage() });
+
+const storageService = StorageContainer.resolve();
 
 // @route POST api/chapter
 // @desc Add manga chapter
@@ -162,33 +149,25 @@ router.post(
     const mangaId = new ObjectId(chapter.mangaId).valueOf();
     var listPublicUrl = new Array();
     try {
-      const promises = Object.keys(files).map(async (key) => {
-        const storageRef = ref(
-          storage,
-          `manga/${mangaId}/chapters/${chapterId}/${files[key].name}`
-        );
+      const promises = Object.keys(files).map(async (key, index) => {
+        
+        const destination = `manga/${mangaId}/chapters/${chapterId}`;
 
-        // Create file metadata including the content type
-        const metadata = {
-          contentType: files[key].mimetype,
+        // files[key] needs to match Express.Multer.File shape
+        const file = {
+          buffer:       files[key].data,        // file data as buffer
+          mimetype:     files[key].mimetype,     // content type
+          originalname: `${chapterId}_${index + 1}`,  // file name
         };
 
-        // Upload the file in the bucket storage
-        const snapshot = await uploadBytesResumable(
-          storageRef,
-          files[key].data,
-          metadata
-        );
-
-        // Grab the public url
-        const downloadUrl = await getDownloadURL(snapshot.ref);
+        const downloadUrl = await storageService.upload(file, destination);
         return downloadUrl;
       });
       const arrUrl = await Promise.all(promises);
       arrUrl.forEach((item) => listPublicUrl.push(item));
     } catch (error) {
       console.log(error);
-      res
+      return res
         .status(500)
         .json({ success: false, message: "Internal server error" });
     }
@@ -249,17 +228,18 @@ router.put("/:id", verifyToken, async (req, res) => {
       message: "Couldn't find this chapter",
     });
   }
-  // Filter list url exist in old list but not in new list to delete on Firebase
+  // Filter list url exist in old list but not in new list to delete on Cloud Storage
   const listDeleteImgUrl = chapter.listImgUrl.filter(
     (img) => !listImgUrl.includes(img)
   );
 
   try {
+    if(listDeleteImgUrl.length > 0){
+      await Promise.all(
+        listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
+      );
+    }
     const chapterUpdateCondition = { _id: chapterId };
-    listDeleteImgUrl.forEach((imgUrl) => {
-      let imgRef = ref(storage, imgUrl);
-      deleteObject(imgRef);
-    });
     let updateChapter = {
       title,
       listImgUrl: listImgUrl || [],
@@ -308,6 +288,12 @@ router.delete("/:id", verifyToken, async (req, res) => {
         success: false,
         message: "Chapter not found or user not authorized",
       });
+    }
+    listDeleteImgUrl = deletedChapter.listImgUrl;
+    if(listDeleteImgUrl.length > 0){
+      await Promise.all(
+        listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
+      );
     }
     const mangaId = deletedChapter.mangaId;
     await Manga.findOneAndUpdate(
