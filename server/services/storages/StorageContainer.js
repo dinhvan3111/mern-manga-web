@@ -2,7 +2,7 @@
 const CloudinaryProvider      = require("../providers/CloudinaryProvider");
 
 const providers = {
-    firebase: () => new FirebaseStorageProvider(),
+    // firebase: () => new FirebaseStorageProvider(),
     cloudinary: () => new CloudinaryProvider(),
 };
 
