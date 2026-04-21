@@ -8,11 +8,16 @@ const genreRouter = require("./routes/genre");
 const chapterRouter = require("./routes/chapter");
 const favouriteMangaRouter = require("./routes/favouriteManga");
 
+const buildMongoUriFromCredentials = () => {
+  const username = process.env.DB_USERNAME || "";
+  const password = encodeURIComponent(process.env.DB_PASSWORD || "");
+  return `mongodb+srv://${username}:${password}@cluster0.uy42yxm.mongodb.net/?retryWrites=true&w=majority`;
+};
+
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.uy42yxm.mongodb.net/?retryWrites=true&w=majority`
-    );
+    const mongoUri = process.env.MONGODB_URI || buildMongoUriFromCredentials();
+    await mongoose.connect(mongoUri);
     console.log("MongoDB connected");
   } catch (error) {
     console.log(error.message);

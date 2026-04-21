@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const verifyToken = require("../middleware/auth.middleware");
 
 const Manga = require("../models/manga");
+const Chapter = require("../models/chapter");
 const FavouriteManga = require("../models/favouriteManga");
 const { ROLE } = require("../utils/database");
 const mangaModel = require("../models/manga.model");
@@ -16,7 +17,7 @@ const multer = require("multer");
 const firebase = require("firebase/app");
 const getCurrentDateTime = require("../utils/timeUtils");
 const StorageContainer = require("../services/storages/StorageContainer");
-
+const { deleteChapter } = require("../services/chapterService");
 const storageService = StorageContainer.resolve();
 
 
@@ -334,19 +335,19 @@ router.delete("/:id", verifyToken, async (req, res) => {
         message: "Manga not found or user not authorized",
       });
     }
+    // Step 1 — delete chapters
     if(mangaDelete.chapters.length > 0){
       await Promise.all(
-        mangaDelete.chapters.map(async (chapter) => {
-          const chapterDeleteCondition = { _id: chapter._id };
-          const deletedChapter = await chapter.findOneAndDelete(
-            chapterDeleteCondition
-          );
-          if (deletedChapter) {
-            storageService.delete(imgUrl)
-          }
+        mangaDelete.chapters.map(async (mangaChapter) => {
+          return await deleteChapter(mangaChapter._id);
         })
       );
     }
+
+    // Step 2 — delete manga thumbnail from storage
+    await storageService.deleteFolder(`manga/${mangaDelete._id}/thumbnail`);
+
+    // Step 3 — delete manga from DB
     const deletedManga = await Manga.findOneAndDelete(mangatDeleteCondition);
 
     // User not authorized or manga not found

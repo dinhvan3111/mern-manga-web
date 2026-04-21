@@ -79,6 +79,25 @@ class CloudinaryProvider extends IStorageProvider {
         });
         return Promise.all(deletePromises);
     }
+
+    async deleteFolder(folderPath) {
+        // Step 1 — get all files
+        const result = await cloudinary.api.resources({
+          type:        "upload",
+          prefix:      folderPath,
+          max_results: 100,
+        });
+      
+        // Step 2 — delete all files if any exist
+        if (result.resources.length) {
+          const publicIds = result.resources.map((file) => file.public_id);
+          await cloudinary.api.delete_resources(publicIds);
+        }
+      
+        // Step 3 — delete the folder itself
+        const deleteFolderResult = await cloudinary.api.delete_folder(folderPath);
+        return deleteFolderResult.deleted.includes(folderPath);
+      }
 }
 
 module.exports = CloudinaryProvider;

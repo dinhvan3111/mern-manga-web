@@ -16,6 +16,7 @@ const ObjectId = require("mongodb").ObjectId;
 const getCurrentDateTime = require("../utils/timeUtils");
 const chapter = require("../models/chapter");
 const StorageContainer = require("../services/storages/StorageContainer");
+const { v4: uuidv4 } = require("uuid");
 
 
 const storageService = StorageContainer.resolve();
@@ -119,10 +120,10 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// @route POST api/chapter/:id/uploadListImgs
-// @desc Upload chapter's image
+// @route PUT api/chapter/:id/uploadListImgs
+// @desc Upload or update chapter's images
 // @access Private
-router.post(
+router.put(
   "/:id/uploadListImgs",
   verifyToken,
   fileUpload({ createParentPath: true }),
@@ -137,47 +138,94 @@ router.post(
         message: "You don't have permission to update this manga",
       });
     }
-    const chapterId = req.params.id;
-    const files = req.files;
-    const chapter = await Chapter.findOne({ _id: chapterId });
-    if (!chapter) {
-      return res.status(400).json({
+    if (req.user.role !== ROLE.ADMIN) {
+      return res.status(401).json({
         success: false,
-        message: "Couldn't find this chapter",
+        message: "You don't have permission to update this chapter",
       });
     }
-    const mangaId = new ObjectId(chapter.mangaId).valueOf();
-    var listPublicUrl = new Array();
+
     try {
-      const promises = Object.keys(files).map(async (key, index) => {
-        
-        const destination = `manga/${mangaId}/chapters/${chapterId}`;
+      const chapterId = req.params.id;
+      const chapter   = await Chapter.findOne({ _id: chapterId });
 
-        // files[key] needs to match Express.Multer.File shape
-        const file = {
-          buffer:       files[key].data,        // file data as buffer
-          mimetype:     files[key].mimetype,     // content type
-          originalname: `${chapterId}_${index + 1}`,  // file name
-        };
+      if (!chapter) {
+        return res.status(404).json({
+          success: false,
+          message: "Couldn't find this chapter",
+        });
+      }
 
-        const downloadUrl = await storageService.upload(file, destination);
-        return downloadUrl;
+      const mangaId      = chapter.mangaId;
+      const oldImageUrls = chapter.listImgUrl || [];  // empty on first upload
+      const newFiles     = req.files || {};
+      const orderedImages = JSON.parse(req.body.orderedImages || "[]");
+
+      // Step 1 — find images to delete
+      // first upload: oldImageUrls = [] → skips this entirely
+      const keptUrls = orderedImages
+        .filter((img) => img.type === "existing")
+        .map((img) => img.url);
+
+      const toDelete = oldImageUrls.filter((url) => !keptUrls.includes(url));
+
+      if (toDelete.length) {
+        await Promise.all(
+          toDelete.map((url) => storageService.delete(url))
+        );
+      }
+
+      // Step 2 — upload new files
+      const uploadedMap = {};  // { originalname: uploadedUrl }
+
+      await Promise.all(
+        Object.keys(newFiles).map(async (key) => {
+          const file = {
+            buffer:       newFiles[key].data,
+            mimetype:     newFiles[key].mimetype,
+            originalname: `${chapterId}_${uuidv4()}`,
+          };
+          const destination = `manga/${mangaId}/chapters/${chapterId}`;
+          const url = await storageService.upload(file, destination);
+
+          // map original filename to uploaded url for ordering later
+          uploadedMap[newFiles[key].name] = url;
+        })
+      );
+
+      // Step 3 — build final ordered list
+      const finalImageUrls = orderedImages.length
+        // update: follow orderedImages positions
+        ? orderedImages.map((img) => {
+            if (img.type === "existing") return img.url;
+            if (img.type === "new")      return uploadedMap[img.file];
+          })
+        // first upload: no orderedImages → just use uploaded urls
+        : Object.values(uploadedMap);
+
+      // Step 4 — save final ordered list to DB ✅ (was missing before!)
+      const updatedChapter = await Chapter.findOneAndUpdate(
+        { _id: chapterId },
+        { $set: { listImgUrl: finalImageUrls } },
+        { new: true }
+      );
+
+      res.json({
+        success: true,
+        message: "Chapter images updated successfully",
+        data: {
+          chapter:     updatedChapter,
+          listImgUrl:  finalImageUrls,
+        },
       });
-      const arrUrl = await Promise.all(promises);
-      arrUrl.forEach((item) => listPublicUrl.push(item));
+
     } catch (error) {
       console.log(error);
-      return res
-        .status(500)
-        .json({ success: false, message: "Internal server error" });
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
     }
-    res.json({
-      success: true,
-      message: "File successfully uploaded",
-      data: {
-        listPublicUrl,
-      },
-    });
   }
 );
 
@@ -229,20 +277,20 @@ router.put("/:id", verifyToken, async (req, res) => {
     });
   }
   // Filter list url exist in old list but not in new list to delete on Cloud Storage
-  const listDeleteImgUrl = chapter.listImgUrl.filter(
-    (img) => !listImgUrl.includes(img)
-  );
+  // const listDeleteImgUrl = chapter.listImgUrl.filter(
+  //   (img) => !listImgUrl.includes(img)
+  // );
 
   try {
-    if(listDeleteImgUrl.length > 0){
-      await Promise.all(
-        listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
-      );
-    }
+    // if(listDeleteImgUrl.length > 0){
+    //   await Promise.all(
+    //     listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
+    //   );
+    // }
     const chapterUpdateCondition = { _id: chapterId };
     let updateChapter = {
-      title,
-      listImgUrl: listImgUrl || [],
+      title: title || chapter.title,
+      listImgUrl: chapter.listImgUrl,
     };
     updateChapter = await Chapter.findOneAndUpdate(
       chapterUpdateCondition,
@@ -274,36 +322,20 @@ router.delete("/:id", verifyToken, async (req, res) => {
   if (req.user.role !== ROLE.ADMIN) {
     return res.status(401).json({
       success: false,
-      message: "You don't have permission to update this manga",
+      message: "You don't have permission to delete this chapter",
     });
   }
   try {
-    const chapterDeleteCondition = { _id: req.params.id };
-    const deletedChapter = await Chapter.findOneAndDelete(
-      chapterDeleteCondition
-    );
-    // User not authorized or chapter not found
-    if (!deletedChapter) {
-      return res.status(401).json({
-        success: false,
-        message: "Chapter not found or user not authorized",
-      });
+    const chapterId = req.params.id;
+    const result = await deleteChapter(chapterId);
+    if (!result.success) {
+      return res.status(404).json(result);
     }
-    listDeleteImgUrl = deletedChapter.listImgUrl;
-    if(listDeleteImgUrl.length > 0){
-      await Promise.all(
-        listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
-      );
-    }
-    const mangaId = deletedChapter.mangaId;
-    await Manga.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { chapters: mangaId } }
-    );
+
     res.json({
       success: true,
       message: "Delete chapter successfully",
-      post: deletedChapter,
+      data: result.data,
     });
   } catch (error) {
     console.log(error);
