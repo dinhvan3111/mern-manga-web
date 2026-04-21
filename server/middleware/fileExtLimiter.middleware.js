@@ -5,7 +5,16 @@ const fileExtLimiter = (allowedExtArray) => {
     const files = req.files;
     const fileExtensions = [];
     Object.keys(files).forEach((key) => {
-      fileExtensions.push(path.extname(files[key].name));
+      const fileOrFiles = files[key];
+
+      // handle array (multiple files same key) or single file
+      const fileArray = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
+      fileArray.forEach((file) => {
+        const filename = file?.name;
+        if (typeof filename === "string") {
+          fileExtensions.push(path.extname(filename));
+        }
+      });
     });
 
     // Determine if the file extensions are allowed

@@ -16,7 +16,7 @@ const ObjectId = require("mongodb").ObjectId;
 const getCurrentDateTime = require("../utils/timeUtils");
 const chapter = require("../models/chapter");
 const StorageContainer = require("../services/storages/StorageContainer");
-const { v4: uuidv4 } = require("uuid");
+const { randomUUID } = require("crypto"); 
 
 
 const storageService = StorageContainer.resolve();
@@ -138,12 +138,6 @@ router.put(
         message: "You don't have permission to update this manga",
       });
     }
-    if (req.user.role !== ROLE.ADMIN) {
-      return res.status(401).json({
-        success: false,
-        message: "You don't have permission to update this chapter",
-      });
-    }
 
     try {
       const chapterId = req.params.id;
@@ -178,20 +172,22 @@ router.put(
       // Step 2 — upload new files
       const uploadedMap = {};  // { originalname: uploadedUrl }
 
-      await Promise.all(
-        Object.keys(newFiles).map(async (key) => {
+        const uploadPromises = Object.keys(newFiles).flatMap((key) => {
+        const fileOrFiles = newFiles[key];
+        const fileArray = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
+        return fileArray.map(async (fileOg) => {
           const file = {
-            buffer:       newFiles[key].data,
-            mimetype:     newFiles[key].mimetype,
-            originalname: `${chapterId}_${uuidv4()}`,
+            buffer:       fileOg.data,
+            mimetype:     fileOg.mimetype,
+            originalname: `${chapterId}_${randomUUID()}`,
           };
           const destination = `manga/${mangaId}/chapters/${chapterId}`;
           const url = await storageService.upload(file, destination);
+          uploadedMap[fileOg.name] = url;
+        });
+      });
 
-          // map original filename to uploaded url for ordering later
-          uploadedMap[newFiles[key].name] = url;
-        })
-      );
+      await Promise.all(uploadPromises);
 
       // Step 3 — build final ordered list
       const finalImageUrls = orderedImages.length
@@ -276,17 +272,8 @@ router.put("/:id", verifyToken, async (req, res) => {
       message: "Couldn't find this chapter",
     });
   }
-  // Filter list url exist in old list but not in new list to delete on Cloud Storage
-  // const listDeleteImgUrl = chapter.listImgUrl.filter(
-  //   (img) => !listImgUrl.includes(img)
-  // );
 
   try {
-    // if(listDeleteImgUrl.length > 0){
-    //   await Promise.all(
-    //     listDeleteImgUrl.map((imgUrl) => storageService.delete(imgUrl))
-    //   );
-    // }
     const chapterUpdateCondition = { _id: chapterId };
     let updateChapter = {
       title: title || chapter.title,
