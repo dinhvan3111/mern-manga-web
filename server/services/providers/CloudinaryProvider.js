@@ -11,6 +11,11 @@ class CloudinaryProvider extends IStorageProvider {
             api_secret: process.env.CLOUDINARY_API_SECRET,
         });
     }
+    getPublicId(url) {
+        const part = url.split('/upload/')[1];
+        const withoutVersion = part.replace(/^v\d+\//, '');
+        return withoutVersion.replace(/\.[^/.]+$/, '');
+    }
 
     async upload(file, destination) {
         return new Promise((resolve, reject) => {
@@ -37,8 +42,9 @@ class CloudinaryProvider extends IStorageProvider {
     }
 
     async delete(filePath) {
+        var publicId = this.getPublicId(filePath);
         return new Promise((resolve, reject) => {
-            cloudinary.uploader.destroy(filePath, (error, result) => {
+            cloudinary.uploader.destroy(publicId, (error, result) => {
                 if (error) {
                     reject(error);
                 } else {

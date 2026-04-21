@@ -159,7 +159,7 @@ router.put(
       // first upload: oldImageUrls = [] → skips this entirely
       const keptUrls = orderedImages
         .filter((img) => img.type === "existing")
-        .map((img) => img.url);
+        .map((img) => img.file);
 
       const toDelete = oldImageUrls.filter((url) => !keptUrls.includes(url));
 
@@ -176,6 +176,7 @@ router.put(
         const fileOrFiles = newFiles[key];
         const fileArray = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
         return fileArray.map(async (fileOg) => {
+          // TODO: if file count is not equal to type"new" count in orderedImages → return error
           const file = {
             buffer:       fileOg.data,
             mimetype:     fileOg.mimetype,
@@ -193,7 +194,7 @@ router.put(
       const finalImageUrls = orderedImages.length
         // update: follow orderedImages positions
         ? orderedImages.map((img) => {
-            if (img.type === "existing") return img.url;
+            if (img.type === "existing") return img.file;
             if (img.type === "new")      return uploadedMap[img.file];
           })
         // first upload: no orderedImages → just use uploaded urls
