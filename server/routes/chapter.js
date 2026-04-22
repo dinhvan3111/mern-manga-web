@@ -17,6 +17,7 @@ const getCurrentDateTime = require("../utils/timeUtils");
 const chapter = require("../models/chapter");
 const StorageContainer = require("../services/storages/StorageContainer");
 const { randomUUID } = require("crypto"); 
+const { deleteChapter } = require("../services/chapterService");
 
 
 const storageService = StorageContainer.resolve();

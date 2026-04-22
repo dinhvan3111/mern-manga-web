@@ -63,7 +63,7 @@ const chapterApi = {
       //     }`,
       //   },
       // });
-      const res = await axiosClient.post(url, data, {
+      const res = await axiosClient.put(url, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

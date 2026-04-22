@@ -72,6 +72,9 @@ class CloudinaryProvider extends IStorageProvider {
             prefix: folderPath,
             max_results: 100,
         });
+        if (!result.resources || result.resources.length === 0) {
+            return [];
+        }
         const deletePromises = result.resources.map((file) => {
             return new Promise((resolve, reject) => {
                 cloudinary.uploader.destroy(file.public_id, (error, result) => {
@@ -93,16 +96,35 @@ class CloudinaryProvider extends IStorageProvider {
           prefix:      folderPath,
           max_results: 100,
         });
-      
+
         // Step 2 — delete all files if any exist
-        if (result.resources.length) {
+        if (result.resources && result.resources.length > 0) {
           const publicIds = result.resources.map((file) => file.public_id);
           await cloudinary.api.delete_resources(publicIds);
         }
-      
-        // Step 3 — delete the folder itself
-        const deleteFolderResult = await cloudinary.api.delete_folder(folderPath);
-        return deleteFolderResult.deleted.includes(folderPath);
+
+        // Step 3 — delete the folder itself (even when folder is already empty)
+        try {
+          const deleteFolderResult = await cloudinary.api.delete_folder(folderPath);
+          if (Array.isArray(deleteFolderResult.deleted)) {
+            return deleteFolderResult.deleted.includes(folderPath);
+          }
+
+          if (deleteFolderResult.deleted && typeof deleteFolderResult.deleted === "object") {
+            return deleteFolderResult.deleted[folderPath] === "deleted";
+          }
+
+          if (typeof deleteFolderResult.message === "string") {
+            return deleteFolderResult.message.toLowerCase().includes("deleted");
+          }
+
+          return false;
+        } catch (error) {
+          if (error && error.error && typeof error.error.message === "string" && error.error.message.includes("Can't find folder")) {
+            return false;
+          }
+          throw error;
+        }
       }
 }
 

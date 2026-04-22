@@ -99,6 +99,9 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
           }
         );
       }
+      else{
+        toast.error(res.message || "Update list images failed");
+      }
     },
     onError: (error) => {
       console.log(error);
@@ -135,11 +138,16 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
   const handleUpdateListImg = async () => {
     const listNewFile = selectedImage.filter((item) =>
       File.prototype.isPrototypeOf(item)
-    );
-    let updateListNewFileRes;
-    let listNewImgUrl = selectedImage;
-    if (listNewFile.length > 0) {
+  );
+  let updateListNewFileRes;
+  let listNewImgUrl = selectedImage;
+  if (listNewFile.length > 0) {
       const formData = new FormData();
+      const orderedImages = Array.from(selectedImage).map((item) => {
+        if (File.prototype.isPrototypeOf(item)) return { type: "new", file: item.name };
+        else return { type: "existing", file: item };
+      });
+      formData.append("orderedImages", JSON.stringify(orderedImages));
       Object.keys(listNewFile).forEach((key) => {
         formData.append(key, listNewFile[key]);
       });
@@ -147,21 +155,8 @@ const ChapterAccordion = ({ chaptersQueries, chapter }) => {
         chapter._id,
         formData
       );
-      if (!updateListNewFileRes.success) return updateListNewFileRes;
-      let resIndex = 0;
-      listNewImgUrl.forEach((item, index) => {
-        if (File.prototype.isPrototypeOf(item)) {
-          listNewImgUrl[index] =
-            updateListNewFileRes.data.listPublicUrl[resIndex];
-          resIndex++;
-        }
-      });
     }
-    const updateChapterRes = await chapterApi.updateChapter(chapter._id, {
-      title: chapter.title,
-      listImgUrl: listNewImgUrl,
-    });
-    return updateChapterRes;
+    return updateListNewFileRes;
   };
   useEffect(() => {
     if (JSON.stringify(selectedImage) !== JSON.stringify(chapter.listImgUrl)) {

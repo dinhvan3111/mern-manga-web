@@ -5,11 +5,27 @@ import BasicModal from "../../../components/popup/BasicModal";
 import { TextField } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import QUERY_KEY from "../../../common/queryKey";
+import { set } from "react-hook-form";
 
 const AddChapterModal = ({ chapter, mangaId, open, handleClosePopup }) => {
   const isAddMode = !chapter ? true : false;
   const queryClient = useQueryClient();
   const [chapterName, setChapterName] = useState(chapter?.title || "");
+
+  const handleClose = (isAfterSaveSuccess = false) => {
+    if(isAfterSaveSuccess === true){
+      if(isAddMode){
+        setChapterName("");
+      }
+      else{
+        setChapterName(chapterName);
+      }
+    }
+    else{
+      setChapterName(chapter?.title);
+    }
+    handleClosePopup();
+  };
   const { isLoading, mutate } = useMutation({
     mutationFn: () => addOrEditChapter(),
     onSuccess: (res) => {
@@ -20,8 +36,7 @@ const AddChapterModal = ({ chapter, mangaId, open, handleClosePopup }) => {
           toast.success("Update chapter successful");
         }
         queryClient.invalidateQueries(QUERY_KEY.CHAPTER_MANAGEMENT);
-        handleClosePopup();
-        setChapterName("");
+        handleClose(true);
       }
     },
     onError: (error) => {
@@ -49,8 +64,8 @@ const AddChapterModal = ({ chapter, mangaId, open, handleClosePopup }) => {
     <BasicModal
       open={open}
       loading={isLoading}
-      handleClose={handleClosePopup}
-      handleCancel={handleClosePopup}
+      handleClose={handleClose}
+      handleCancel={handleClose}
       handleConfirm={mutate}
       confirmBtnLabel={isAddMode ? "Add" : "Update"}
     >
